@@ -1,0 +1,9 @@
+{
+  "name": "Chef Ledger",
+  "short_name": "ChefLedger",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#111614",
+  "theme_color": "#111614",
+  "icons": []
+}

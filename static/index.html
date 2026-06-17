@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Chef Ledger — Back-of-House Operations</title>
+<meta http-equiv="Cache-Control" content="no-store"/>
+<link href="/styles.css?v=61" rel="stylesheet"/>
+<link href="/manifest.webmanifest" rel="manifest"/>
+<meta content="#111614" name="theme-color"/>
+</head>
+<body>
+<div class="toast" hidden="" id="toast"></div>
+<div class="modal-backdrop" hidden="" id="confirmModal">
+<div class="modal-card">
+<h2>Use These Settings?</h2>
+<p class="muted" id="confirmModalText">Submitting will save this BUILD tool to the restaurant database and update connected pages.</p>
+<div class="row right">
+<button class="ghost" id="confirmNoBtn" type="button">No</button>
+<button class="primary" id="confirmYesBtn" type="button">Yes</button>
+</div>
+</div>
+</div>
+<datalist id="productSearchOptions"></datalist>
+<datalist id="recipeSearchOptions"></datalist>
+<datalist id="stationOptions"></datalist><datalist id="stockLocationOptions"></datalist>
+<main class="auth-shell" id="authScreen">
+<section class="auth-card brand-panel">
+<div class="mark">CL</div>
+<p class="eyebrow">chef-ledger.com restaurant operating system</p>
+<h1>Drop the clipboard. Let the kitchen ledger do the arithmetic.</h1>
+<p class="muted">Chef Ledger turns the work restaurants already do — counts, prep lists, station restocks, vendor orders, recipe cards, POS history, and employee submissions — into one clean, auditable workflow.</p>
+<p class="muted">After the initial setup, the hours saved can pay for the subscription. Plug in the numbers, let the builder fill the site, and keep working while the app turns daily kitchen activity into order sheets, prep sheets, inventory history, and accountability.</p>
+<div class="pill-row">
+<span>No more chicken-scratch counts</span>
+<span>Automatic order sheets</span>
+<span>Traceable prep accountability</span>
+<span>Portable recipebook tools</span>
+</div>
+</section>
+<section class="auth-card pricing-panel" id="landingPricingPanel">
+<p class="eyebrow">Choose a tier</p>
+<h2>Simple monthly pricing for real kitchens</h2>
+<p class="muted small-note">Start with the tier that fits your operation. Every tier is capped by included FILES storage so the website owner can control overhead while restaurants only pay for what they need.</p>
+<div class="pricing-grid compact-pricing" id="authTierCards"></div>
+<p class="muted small-note">Stripe paylinks can be configured per tier. In local preview, choosing a tier creates the account and keeps the workspace locked until the subscription is activated.</p>
+</section>
+<section class="auth-card">
+<div class="tabs compact-tabs" data-tabs="authTabs">
+<button class="active" data-tab="login">Login</button>
+<button data-tab="register">Create account</button>
+<button data-tab="join">Join with passcode</button>
+</div>
+<form class="tab-panel active" data-panel="login" id="loginForm">
+<h2>Login</h2>
+<label>Email <input name="email" placeholder="chef@example.com" required="" type="email"/></label>
+<label>Password <input name="password" placeholder="••••••••" required="" type="password"/></label>
+<button class="primary" type="submit">Login</button>
+<div class="demo-login-card">
+<strong>Sign in demo account</strong>
+<p class="muted small-note">Choose a sized demo restaurant. Each one signs in automatically and opens a filled demo site.</p>
+<div class="demo-button-grid">
+<button class="ghost demo-login-option" data-demo-email="boutique@chefledger.test" type="button">DEMO-boutique</button>
+<button class="ghost demo-login-option" data-demo-email="steady@chefledger.test" type="button">DEMO-steady</button>
+<button class="ghost demo-login-option" data-demo-email="highvolume@chefledger.test" type="button">DEMO-high volume</button>
+</div>
+<code>Password for all: ChefLedger123!</code>
+</div>
+</form>
+<form class="tab-panel" data-panel="register" id="registerForm">
+<h2>Create restaurant account</h2>
+<label>Restaurant / team name <input name="team_name" placeholder="The Harbor Room" required=""/></label>
+<label>Your name <input name="name" placeholder="Chef Alex" required=""/></label>
+<label>Email <input name="email" placeholder="chef@example.com" required="" type="email"/></label>
+<label>Password <input minlength="6" name="password" placeholder="At least 6 characters" required="" type="password"/></label>
+<input name="subscription_tier" id="registerSubscriptionTier" value="starter" type="hidden"/>
+<div class="selected-tier-box" id="selectedTierBox">Selected tier: Starter · $10/month</div>
+<p class="muted small-note">Creates a real restaurant profile. The app workspace stays locked until the selected subscription tier is activated through checkout.</p>
+<button class="primary" type="submit">Create profile and continue to checkout</button>
+</form>
+<form class="tab-panel" data-panel="join" id="joinForm">
+<h2>Employee mobile login</h2>
+<label>One-time passcode <input name="code" placeholder="ABC12345" required=""/></label>
+<label>Name <input name="name" placeholder="Line Cook" required=""/></label>
+<label>Email <input name="email" placeholder="employee@example.com" required="" type="email"/></label>
+<label>Password <input minlength="6" name="password" placeholder="At least 6 characters" required="" type="password"/></label>
+<button class="primary" type="submit">Join team</button>
+</form>
+</section>
+</main>
+<main class="auth-shell subscription-lock-shell" hidden="" id="subscriptionLockScreen">
+<section class="auth-card brand-panel">
+<div class="mark">CL</div>
+<p class="eyebrow">subscription required</p>
+<h1>Choose a tier to unlock the kitchen.</h1>
+<p class="muted">Your profile is created. Select a monthly plan, complete checkout, then Chef Ledger opens the tools your tier includes. Until then, the account workspace stays protected.</p>
+<div class="pill-row">
+<span>Built for daily counts</span>
+<span>Prep sheets without guessing</span>
+<span>Order sheets without retyping</span>
+<span>Auditable kitchen work</span>
+</div>
+<button class="ghost" id="subscriptionLogoutBtn" type="button">Logout</button>
+</section>
+<section class="auth-card subscription-lock-card">
+<p class="eyebrow">finish setup</p>
+<h2>Pick the plan that matches your operation</h2>
+<p class="muted small-note">The first setup takes a little discipline. After that, the app is designed to save hours by replacing repeated paper counts, combined prep lists, unclear notes, and end-of-night spreadsheet entry.</p>
+<div class="pricing-grid" id="subscriptionTierCards"></div>
+<div class="local-activation-box" id="localActivationBox" hidden>
+<h3>Local preview activation</h3>
+<p class="muted small-note">This button is only for testing the local build without a live Stripe webhook. Production should activate from Stripe checkout/webhooks.</p>
+<button class="primary" id="activateLocalSubscriptionBtn" type="button">Activate selected tier in local preview</button>
+</div>
+</section>
+</main>
+<main class="app-shell" hidden="" id="appShell">
+<header class="app-menu">
+<button class="logo-row brand-home" id="brandHomeBtn" data-view="dashboard" type="button" aria-label="Go to Dashboard"><img class="brand-home-logo" src="assets/images/chefledger_logo_square.png" alt="Chef Ledger logo"/><div><strong>Chef Ledger</strong><span id="teamName">Your Restaurant</span></div></button>
+<nav aria-label="Chef Ledger main menu" class="menu-bar" id="mainNav">
+<button class="active" data-view="dashboard">Dashboard</button>
+<div class="menu-group leader-only-inline"><button class="menu-trigger" data-view="build" type="button">BUILD ▾</button><div class="menu-drop"><span class="menu-subhead">SETUP ORDER</span><button data-focus="buildVendorToolPage" data-subpage="vendors" data-view="build">Vendor Builder</button><button data-focus="buildLocationToolPage" data-subpage="locations" data-view="build">Location Builder</button><button data-focus="buildStationToolPage" data-subpage="stations" data-view="build">Station Builder</button><button data-focus="buildInventoryToolPage" data-subpage="inventory" data-view="build">Inventory Builder</button><button data-focus="buildManualInventoryToolPage" data-subpage="manual_inventory" data-view="build">Manual Inventory</button><span class="menu-subhead">KITCHEN STRUCTURE</span><button data-focus="buildRecipeToolPage" data-subpage="recipes" data-view="build">Recipe Builder</button><button data-focus="buildPlateToolPage" data-subpage="plates" data-view="build">Menu Item / Plate Builder</button><button data-focus="buildPrepToolPage" data-subpage="prep" data-view="build">Prep-Sheet Builder</button><span class="menu-subhead">EMPLOYEE PROFILE BUILD</span><button data-focus="buildEmployeeCard" data-subpage="employees" data-view="build">Employee Profile BUILD overview</button><button data-focus="buildEmployeeMessageBuilderPage" data-subpage="employee_message" data-view="build">Employee → Message Builder</button><button data-focus="buildEmployeeDaysOffPage" data-subpage="employee_days_off" data-view="build">Employee → Days-Off Profile</button><button data-focus="buildEmployeeScheduleProfilePage" data-subpage="employee_schedule" data-view="build">Employee Profile BUILD → Schedule Availability</button><span class="menu-subhead">SCHEDULE BUILD</span><button data-focus="buildChefSchedulerCard" data-subpage="schedule" data-view="build">Schedule BUILD → Blueprint Builder</button></div></div>
+<div class="menu-group" data-view="inventory"><button class="menu-trigger" data-view="inventory" type="button">Inventory ▾</button><div class="menu-drop"><button data-focus="inventorySheetTabsCard" data-inventory-menu-tab="onhand" data-subpage="onhand" data-view="inventory">ON HAND (in use)</button><button data-focus="inventorySheetTabsCard" data-inventory-menu-tab="storage" data-subpage="storage" data-view="inventory">STORAGE</button><button data-focus="inventorySheetTabsCard" data-inventory-menu-tab="prep" data-subpage="prep" data-view="inventory">PREP ESTIMATOR</button><button data-focus="inventorySheetTabsCard" data-inventory-menu-tab="delivery" data-subpage="delivery" data-view="inventory">UNTIL NEXT DELIVERY</button><button data-focus="inventorySheetTabsCard" data-inventory-menu-tab="par" data-subpage="par" data-view="inventory">PAR / BELOW PAR</button><button data-focus="inventoryWatchlistCard" data-inventory-menu-tab="watchlist" data-subpage="watchlist" data-view="inventory">WATCHLIST / ORDER RISK</button></div></div>
+
+<div class="menu-group" data-view="count"><button class="menu-trigger" data-view="count" type="button">COUNT ▾</button><div class="menu-drop"><button data-focus="countStockAreaCard" data-count-subpage="areas" data-subpage="areas" data-view="count">ALL STOCK AREA(s)</button><button data-focus="countSuggestedParCard" data-count-subpage="suggested" data-subpage="suggested" data-view="count">SUGGESTED PAR TO ORDER</button><button data-focus="countVendorSheetsCard" data-count-subpage="vendors" data-subpage="vendors" data-view="count">VENDOR SHEETS</button><button data-focus="countPriceOptimizerCard" data-count-subpage="optimizer" data-subpage="optimizer" data-view="count">PRICE OPTIMIZER</button></div></div>
+<div class="menu-group"><button class="menu-trigger" data-view="recipes" type="button">Recipes &amp; Plates ▾</button><div class="menu-drop"><button data-focus="recipeList" data-subpage="cards" data-view="recipes">RECIPE CARDS</button><button data-focus="platePictureGallery" data-subpage="pictures" data-view="recipes">PLATE PICTURES</button><button data-focus="dishList" data-subpage="plates" data-view="recipes">PLATES / MENU ITEMS</button><button data-focus="optimizerRecipe" data-subpage="optimizer" data-view="recipes">ADJUST PLATE / RECIPE COST</button></div></div>
+<div class="menu-group"><button class="menu-trigger" data-view="prep" type="button">Prep ▾</button><div class="menu-drop"><button data-focus="prepUnifiedWorkflowCard" data-subpage="prepsheet" data-view="prep">PREPSHEET</button><button data-focus="claimPrepItemCard" data-subpage="prepsheet" data-view="prep">CLAIM PREP ITEM</button><button data-focus="prepForecasterCard" data-subpage="forecaster" data-view="prep">FORECASTER</button></div></div>
+<div class="menu-group"><button class="menu-trigger" data-view="orders" type="button">Orders ▾</button><div class="menu-drop"><button data-focus="ordersNextDeadlineCard" data-subpage="deadline" data-view="orders">NEXT DEADLINE</button><button data-focus="ordersVendorSheetCard" data-subpage="order_sheet" data-view="orders">ORDER SHEET</button><button data-focus="suggestionsTable" data-subpage="needed" data-view="orders">NEEDED</button><button data-focus="vendorNeededCard" data-subpage="vendor" data-view="orders">VENDOR</button><button data-focus="ordersList" data-subpage="deliveries" data-view="orders">DELIVERIES</button><button data-focus="posImportForm" data-subpage="pos" data-view="orders">POS IMPORT</button></div></div>
+<div class="menu-group manager-only-inline"><button class="menu-trigger" data-view="scheduler" type="button">Manager ▾</button><div class="menu-drop">
+<button data-focus="weeklyScheduleBoard" data-subpage="planner" data-view="scheduler">Schedule planner</button>
+<button data-focus="weeklyScheduleBoard" data-subpage="builder" data-view="scheduler">Fill shifts / offers</button>
+<button data-focus="managerPreplistPanel" data-subpage="preplist" data-view="scheduler">PREPLIST rank / assign</button>
+<button data-focus="hoursList" data-subpage="hours" data-view="scheduler">Hours &amp; overtime</button>
+<button data-focus="shiftList" data-subpage="approvals" data-view="scheduler">Shift approvals / responses</button>
+</div></div>
+<div class="menu-group" data-view="files"><button class="menu-trigger" data-view="files" type="button">Files ▾</button><div class="menu-drop"><button data-files-subpage="landing" data-subpage="landing" data-view="files" type="button">FILES landing</button><button data-files-subpage="pos" data-subpage="pos" data-view="files" type="button">POS CSV</button><button data-files-subpage="pictures" data-subpage="pictures" data-view="files" type="button">Pictures</button><button data-files-subpage="inventories" data-subpage="inventories" data-view="files" type="button">Saved Inventories</button><button data-files-subpage="prep" data-subpage="prep" data-view="files" type="button">PREP SHEETs</button><button data-files-subpage="vendors" data-subpage="vendors" data-view="files" type="button">VENDOR</button><button data-files-subpage="deliveries" data-subpage="deliveries" data-view="files" type="button">DELIVERIES</button><button data-files-subpage="menu" data-subpage="menu" data-view="files" type="button">MENU</button><button data-files-subpage="qr" data-subpage="qr" data-view="files" type="button">QR CODE MAKER</button><button data-files-subpage="schedules" data-subpage="schedules" data-view="files" type="button">SCHEDULE(s)</button></div></div>
+<div class="menu-group"><button class="menu-trigger" data-view="team" type="button">Team ▾</button><div class="menu-drop"><button data-team-subpage="access" data-view="team" type="button">ACCESS</button><button data-team-subpage="messages" data-view="team" type="button">POSTS / INCIDENTS</button><button data-team-subpage="members" data-view="team" type="button">MEMBERS</button><button data-team-subpage="timeoff" data-view="team" type="button">REQUEST TIME OFF</button><button data-team-subpage="votes" data-view="team" type="button">VOTE</button><button data-team-subpage="notifications" data-view="team" type="button">NOTIFICATIONS</button><span class="menu-subhead">EMPLOYEE SETUP LIVES IN BUILD</span><button data-focus="buildEmployeeCard" data-subpage="employees" data-view="build" type="button">Employee Profile BUILD overview</button><button data-focus="buildEmployeeMessageBuilderPage" data-subpage="employee_message" data-view="build" type="button">Employee → Message Builder</button><button data-focus="buildEmployeeDaysOffPage" data-subpage="employee_days_off" data-view="build" type="button">Employee → Days-Off Profile</button><button data-focus="buildEmployeeScheduleProfilePage" data-subpage="employee_schedule" data-view="build" type="button">Employee Profile BUILD → Schedule Availability</button></div></div>
+</nav>
+<div class="menu-actions"></div>
+</header>
+<section class="workspace">
+<header class="topbar">
+<div>
+<p class="eyebrow" id="roleLine">Back of house command center</p>
+<h1 id="pageTitle">Dashboard</h1>
+</div>
+<div class="top-actions">
+<label class="demo-switch-label">Demo profile
+            <select id="demoProfileSwitch">
+<option value="">Switch demo role…</option>
+<option value="chef@chefledger.test">Chef Alex · owner</option>
+<option value="sous@chefledger.test">Jamie · manager/sous</option>
+<option value="dana@chefledger.test">Dana · team leader</option>
+<option value="maya@chefledger.test">Maya · employee + inventory access</option>
+<option value="luis@chefledger.test">Luis · limited employee</option>
+<option value="riley@chefledger.test">Riley · limited employee</option>
+</select>
+</label>
+<label class="currency-switch-label">Currency <select id="currencySelect"><option value="USD">USD $</option><option value="CAD">CAD $</option><option value="MXN">MXN $</option><option value="EUR">EUR €</option><option value="GBP">GBP £</option><option value="CHF">CHF</option><option value="DKK">DKK kr</option><option value="SEK">SEK kr</option><option value="NOK">NOK kr</option><option value="JPY">JPY ¥</option><option value="KRW">KRW ₩</option><option value="CNY">CNY ¥</option><option value="HKD">HKD $</option><option value="SGD">SGD $</option><option value="THB">THB ฿</option><option value="VND">VND ₫</option><option value="INR">INR ₹</option><option value="AED">AED د.إ</option><option value="TRY">TRY ₺</option><option value="MAD">MAD</option><option value="AUD">AUD $</option><option value="NZD">NZD $</option><option value="BRL">BRL R$</option><option value="ARS">ARS $</option><option value="PEN">PEN S/</option><option value="CLP">CLP $</option><option value="COP">COP $</option><option value="ZAR">ZAR R</option></select></label><button class="ghost" id="notificationBtn">Notifications <span class="badge" id="notificationCount">0</span></button>
+<span class="user-chip" id="userName"></span>
+<button class="ghost" id="logoutBtn">Logout</button>
+</div>
+</header>
+<section class="view active" id="dashboard">
+<article class="dashboard-brand-hero card wide">
+  <div class="dashboard-hero-copy">
+    <p class="eyebrow">Chef Ledger command center</p>
+    <h2>Plan. Prep. Profit.</h2>
+    <p>Every station, count, prep list, schedule, and vendor deadline in one kitchen operating system.</p>
+    <div class="pill-row"><span>Live inventory</span><span>Station prep</span><span>Vendor deadlines</span><span>Schedule control</span></div>
+  </div>
+</article>
+<div class="grid four" id="dashboardCards"></div>
+<div class="grid three kitchen-feature-row">
+  <article class="kitchen-image-card kitchen-img-service"><span>Service in motion</span><strong>Station visibility</strong></article>
+  <article class="kitchen-image-card kitchen-img-dashboard"><span>Counts into forecasts</span><strong>Kitchen intelligence</strong></article>
+  <article class="kitchen-image-card kitchen-img-pass"><span>Chef-ready workflow</span><strong>Prep to profit</strong></article>
+</div>
+<div class="grid two">
+<article class="card"><div class="card-head"><h2>Needed now</h2><button class="ghost" data-jump="prep">Open Prep</button></div><div class="list" id="neededNowList"></div></article>
+<article class="card"><div class="card-head"><h2>Inventory risk</h2><button class="ghost" data-jump="orders">Build Order</button></div><div class="list" id="riskList"></div></article>
+</div>
+<div class="grid two">
+<article class="card subpage-block" data-subpage="planner"><h2>Open shifts</h2><div class="list" id="openShiftList"></div></article>
+<article class="card"><h2>Expiring station batches</h2><div class="list" id="expiringList"></div></article>
+</div>
+</section>
+<section class="view" id="build">
+<article class="card wide hero-card">
+<p class="eyebrow">BUILD menu</p>
+<h2>Build the restaurant database once, then let every menu tool pull from it.</h2>
+<p class="muted">BUILD is the setup layer. The chef or team leader creates inventory items, vendors, recipes, dishes, stations, employee profiles, and schedule rules here. The main menu then becomes the live operating layer: employees count stations, prep is deducted from stock, deliveries update on-hand inventory, POS imports drive forecasts, and the scheduler respects employee availability.</p>
+<div class="pill-row"><span>Set up once</span><span>Reuse everywhere</span><span>Less pen-and-paper copying</span><span>Cleaner employee permissions</span></div>
+</article><article class="card wide subpage-info" id="subpageInfoCard"><p class="eyebrow">Selected tool</p><h2>BUILD tools</h2><p class="muted">BUILD is the setup side of Chef Ledger. Each BUILD subpage creates the restaurant-specific database records that the live operating pages use during prep, service, ordering, and scheduling.</p><div class="grid three tight-info"><div><h3>How to use</h3><p>Pick one BUILD subpage from the dropdown, fill in the setup form, then use SUBMIT to confirm and propagate it.</p></div><div><h3>What it ties into</h3><p>Inventory, recipes, plates, stations, vendors, employees, schedule blueprint, prep templates, orders, and POS forecasting.</p></div><div><h3>Why it saves money</h3><p>It stops duplicate entry. A chef enters the setup once and every operating page pulls the same clean record.</p></div></div></article><div class="subpage-bar" data-subpage-bar="build" id="buildSubpageBar"><button data-subpage-select="landing" type="button">BUILD landing</button><button data-subpage-select="vendors" type="button">Vendor Builder</button><button data-subpage-select="locations" type="button">Location Builder</button><button data-subpage-select="stations" type="button">Station Builder</button><button data-subpage-select="inventory" type="button">Inventory Item Builder</button><button data-subpage-select="manual_inventory" type="button">Manual Inventory</button><button data-subpage-select="recipes" type="button">Recipe Builder</button><button data-subpage-select="plates" type="button">Menu Item / Plate Builder</button><button data-subpage-select="prep" type="button">Prep-Sheet Builder</button><button data-subpage-select="employees" type="button">Employee Builder Overview</button><button data-subpage-select="employee_message" type="button">Employee → Message Builder</button><button data-subpage-select="employee_days_off" type="button">Employee → Days-Off Profile</button><button data-subpage-select="employee_schedule" type="button">Employee → Scheduling Profile</button><button data-subpage-select="schedule" type="button">Schedule BUILD</button></div>
+<div class="build-layout build-layout-no-side">
+<div class="build-main"><section class="build-page card wide subpage-block" data-subpage="landing" id="buildLandingPage"><h2>BUILD landing</h2><p class="menu-routing-note">Use the BUILD dropdown in the top menu to open each builder page. The old side column was removed so this page follows the same navigation pattern as the rest of the app.</p><p class="muted">Start here when setting up a restaurant profile. BUILD pages are the database builders: they create the vendors, items, stations, recipes, plates, prep templates, employee permissions, and schedule blueprint that every live menu page uses later.</p><div class="grid three"><div class="mini-card"><h3>1. Build vendors and count locations</h3><p>Vendors and locations create the supply-side structure for ordering, stock counts, and delivery receiving.</p></div><div class="mini-card"><h3>2. Build stations before inventory</h3><p>Stations should be saved before Inventory Item Builder so inventory, recipes, prep, and schedule tools can use the same station dropdowns.</p></div><div class="mini-card"><h3>3. Build inventory, recipes, plates, employees, and schedule</h3><p>Inventory feeds recipes and plates; employees and schedule blueprint prevent avoidable scheduling conflicts.</p></div></div></section>
+<section class="build-page card wide subpage-block" data-subpage="vendors" id="buildVendorToolPage"><h2>BUILD → Vendor Builder</h2><p class="muted">Build vendors first. Vendor profiles feed Inventory Items, Order Day reminders, Delivery forecasts, and Vendor Orders.</p><div class="build-help-grid"><div><h3>How to use Vendor Builder</h3><p>Enter vendor order days, delivery days, cutoff time, lead days, and contact info. Then Inventory Items can be tied to that vendor and Orders can group suggested quantities by vendor.</p></div><div><h3>Why useful</h3><p>The chef no longer has to remember who delivers what and when. Order-day reminders and vendor-specific order sheets pull from this one setup page.</p></div></div><div id="buildVendorToolMount"></div></section>
+<section class="build-page card wide subpage-block" data-subpage="locations" id="buildLocationToolPage"><h2>BUILD → Location Builder</h2><p class="muted">Create the stock rooms, shelves, coolers, freezer areas, and storage locations used by COUNT. Each location has a subclass and an IN ORDER number so COUNT tabs appear in the restaurant’s preferred walking order.</p><div class="build-help-grid"><div><h3>How to use Location Builder</h3><p>Enter a location name, add a subclass like dairy, sauces cold, dry goods, #10 cans, or freezer, then enter IN ORDER N COUNT. Inventory Item Builder will use this list for each item’s LOCATION field.</p></div><div><h3>Why useful</h3><p>COUNT follows the same path every time. Employees do not bounce between random shelves or miss areas because the app orders tabs by the chef’s physical stockroom route.</p></div></div><form class="card form-card leader-only" id="locationForm"><h2>Add count location</h2><div class="form-grid"><label>Name of location <input name="name" placeholder="Walk-In Cooler · Produce Rack" required=""/></label><label>Subclass <input name="subclass" placeholder="Dairy, sauces (cold), dry goods, #10 cans"/></label><label>IN ORDER N COUNT <input name="sort_order" type="number" min="1" step="1" placeholder="1"/></label></div><label>Notes <textarea name="notes" placeholder="Optional: start here during Monday count, top shelf first"></textarea></label><button class="primary" type="submit">SAVE LOCATION</button></form><div class="list compact-list" id="locationBuilderList"></div></section>
+<section class="build-page card wide subpage-block" data-subpage="inventory" id="buildInventoryToolPage"><h2>BUILD → Inventory Item Builder</h2><p class="muted">Create raw stock records: item name, LOCATION, amount per quantity, quantity in storage, par, reorder point, vendor, supplier pack, and shelf life. Saved items become selectable ingredients in Recipe Builder and components in Plate Builder.</p><div class="build-help-grid"><div><h3>How to use Inventory Item Builder</h3><p>Add the item name, LOCATION from Location Builder, amount per quantity, quantity in storage, par level, reorder point, vendor, supplier pack, and shelf life. These items become the only selectable ingredients in Recipe Builder.</p></div><div><h3>Why useful</h3><p>Clean item setup keeps recipe costing, prep deductions, storage counts, and vendor orders using the same measurement system.</p></div></div><div id="buildInventoryToolMount"></div></section>
+<section class="build-page card wide subpage-block" data-subpage="manual_inventory" id="buildManualInventoryToolPage"><h2>BUILD → Manual Inventory</h2><p class="muted">Hard-count a product when the real walk-in / dry storage number is known. This corrects STORAGE and flows through On Hand, Prep Estimator, Until Next Delivery, and Orders.</p><div class="build-help-grid"><div><h3>How to use Manual Inventory</h3><p>Choose the item and enter the hard count from the walk-in, dry storage, freezer, or stockroom. This replaces the calculated number with the real count.</p></div><div><h3>Why useful</h3><p>Manual inventory corrects drift from spills, waste, bad counts, or emergency use, so orders are based on actual stock.</p></div></div><form class="form-card inner-form" id="manualInventoryForm"><div class="form-grid"><label>Inventory item <select id="manualInventoryProductSelect" name="product_id" required=""></select></label><label>Actual storage quantity <input name="quantity" required="" step="0.001" type="number"/></label><label>Reason <input name="reason" value="Manual inventory count"/></label></div><button class="primary" type="submit">UPDATE ACTUAL STOCK</button></form></section>
+<section class="build-page card wide subpage-block" data-subpage="stations" id="buildStationToolPage"><h2>BUILD → Station Builder</h2><p class="muted">Create station names exactly how the restaurant uses them. Stations populate Prep, Recipe, Plate, Inventory, Scheduler, and Employee Profile dropdowns.</p><div class="build-help-grid"><div><h3>How to use Station Builder</h3><p>Create the station names the restaurant actually uses, like Grill, Cold Prep, Pantry, Sauce, Expo, or Dessert.</p></div><div><h3>Why useful</h3><p>Stations organize recipes, plates, prep sheets, station closeout, schedule coverage, and employee qualifications.</p></div></div><div id="buildStationToolMount"></div></section>
+<section class="build-page card wide subpage-block" data-subpage="recipes" id="buildRecipeToolPage"><h2>BUILD → Recipe Builder</h2><p class="muted">Recipes pull only from saved inventory items. Add containers so employees know what to store a recipe in after it is made and what station container should be stocked for service.</p><div class="build-help-grid"><div><h3>How to use Recipe Builder</h3><p>Select inventory items from the search box, enter the amount used, add optional steps/sub-steps, and define storage and station containers.</p></div><div><h3>Why useful</h3><p>One recipe card now powers prep sheets, employee read-only recipe cards, ingredient deductions, and food-cost math.</p></div></div><div id="buildRecipeToolMount"></div></section>
+<section class="build-page card wide subpage-block" data-subpage="plates" id="buildPlateToolPage"><h2>BUILD → Menu Item / Plate Builder</h2><p class="muted">Build sellable plates from recipes and direct items. Plate records drive per-plate cost, POS usage forecasting, station prep templates, and finished-plate picture reference.</p><div class="build-help-grid"><div><h3>How to use Menu Item / Plate Builder</h3><p>Build a menu item from recipes and direct items, add portions, station, menu price, and optional plate picture URL.</p></div><div><h3>Why useful</h3><p>Plate setup connects POS plate counts to theoretical ingredient use, food cost, prep templates, and over/under-use analytics.</p></div></div><div id="buildPlateToolMount"></div></section>
+<section class="build-page card wide subpage-block" data-subpage="prep" id="buildPrepToolPage"><h2>BUILD → Prep-Sheet Builder</h2><p class="muted">Chef-only station template builder. Select a station, generate from Plates, and save the checklist employees will use in PREP.</p><div class="build-help-grid"><div><h3>How to use Prep-Sheet Builder</h3><p>Choose a station and generate its recurring checklist from the plates assigned to that station. Save it as the employee PREP template.</p></div><div><h3>Why useful</h3><p>Employees no longer write random prep notes. The station checklist is standardized and feeds chef review, prep impact, and ordering risk.</p></div></div><div id="buildPrepToolMount"></div></section>
+<section class="build-page card wide subpage-block" data-subpage="employees" id="buildEmployeeCard"><h2>BUILD → Employee Builder Overview</h2>
+<p class="muted">Employee Builder is the setup category for each team member. Use its subpages to decide who can receive messages, how many days off they have, and which stations / shifts they can work.</p>
+<div class="build-help-grid"><div><h3>How to use Employee Builder</h3><p>Start with the overview, then open Message Builder, Days-Off Profile, or Scheduling Profile. These BUILD pages create the employee rules that Teams, Scheduler, Access, Notifications, and Requests use during service.</p></div><div><h3>Why useful</h3><p>Employee setup is centralized. Managers do not have to copy station qualifications, time-off balances, message permissions, and schedule availability into separate notebooks.</p></div></div>
+<div class="grid three employee-build-launchers">
+<button class="primary" data-subpage-select="employee_message" type="button">Open Message Builder</button>
+<button class="primary" data-subpage-select="employee_days_off" type="button">Open Days-Off Profile</button>
+<button class="primary" data-subpage-select="employee_schedule" type="button">Open Scheduling Profile</button>
+</div></section><section class="build-page card wide subpage-block" data-subpage="employee_message" id="buildEmployeeMessageBuilderPage">
+<h2>BUILD → Employee Builder → Message Builder</h2>
+<p class="muted">Set what each employee is allowed to receive or act on when team posts are routed by task. This is employee setup, so it belongs in Employee Builder instead of the live message page.</p>
+<div class="build-help-grid"><div><h3>How to use Message Builder</h3><p>Select an employee, check the task categories they are eligible to receive, add any manager notes, and save. These settings control which posts, incidents, ordering notes, maintenance alerts, prep issues, and vote topics route to that employee.</p></div><div><h3>Why useful</h3><p>Restaurants can send the right problem to the right people without giving full manager access. A spilled item can alert ordering/manual-inventory helpers, while a broken fryer routes to maintenance-eligible staff.</p></div></div>
+<form class="card form-card leader-only" id="messagePermissionForm">
+<h2>MESSAGE BUILDER</h2>
+<p class="muted">Assign what each employee is eligible to receive. Leave a box blank if the employee should not receive that task category.</p>
+<label>Employee <select id="messagePermissionUserSelect" name="user_id" required=""></select></label>
+<div class="checkbox-grid tool-checkboxes" id="messagePermissionTools">
+<label><input name="tool" type="checkbox" value="generic"/> Generic notes</label>
+<label><input name="tool" type="checkbox" value="ordering"/> Ordering</label>
+<label><input name="tool" type="checkbox" value="manual_inventory"/> Manual inventory</label>
+<label><input name="tool" type="checkbox" value="scheduler"/> Scheduling</label>
+<label><input name="tool" type="checkbox" value="prep"/> Prep</label>
+<label><input name="tool" type="checkbox" value="station"/> Station closeout</label>
+<label><input name="tool" type="checkbox" value="maintenance"/> Maintenance</label>
+<label><input name="tool" type="checkbox" value="vote"/> Vote topics</label>
+</div>
+<label>Notes <input name="notes" placeholder="Example: can receive ordering notes but cannot place vendor orders"/></label>
+<button class="primary">Save message eligibility</button>
+</form></section><section class="build-page card wide subpage-block" data-subpage="employee_days_off" id="buildEmployeeDaysOffPage">
+<h2>BUILD → Employee Builder → Employee Days-Off Profile</h2>
+<p class="muted">Build each employee’s days-off bank here: allowed days, remaining balance, reset date, and rollover rule. The live Teams → Request Time Off page uses this profile when employees submit requests.</p>
+<div class="build-help-grid"><div><h3>How to use Days-Off Profile</h3><p>Select an employee, enter the number of days allowed, current remaining balance, reset date, and whether unused days roll over. Save the profile before approving requests.</p></div><div><h3>Why useful</h3><p>Time-off decisions stop being a notebook calculation. Approved requests deduct from the employee profile and create scheduler blocks automatically.</p></div></div>
+<form class="card form-card leader-only" id="timeOffProfileForm">
+<h3>Employee days-off profile</h3>
+<label>Employee <select id="timeOffProfileUserSelect" name="user_id" required=""></select></label>
+<div class="form-grid"><label>Days allowed per reset <input min="0" name="days_off_allowed" placeholder="10" step="0.5" type="number"/></label><label>Days off remaining <input min="0" name="days_off_remaining" placeholder="10" step="0.5" type="number"/></label><label>Reset days off date <input name="days_off_reset_date" type="date"/></label><label>Reset rule <select name="days_off_rollover"><option value="0">Reset to allowed days</option><option value="1">Rollover + add new days</option></select></label></div>
+<button class="primary">Save employee profile</button>
+</form></section><section class="build-page card wide subpage-block" data-subpage="employee_schedule" id="buildEmployeeScheduleProfilePage">
+<h2>BUILD → Employee Builder → Scheduling Profile</h2>
+<p class="muted">Build the ongoing scheduling profile for each employee: color, station qualifications, eligible shifts, can-work patterns, and cannot-work patterns. Scheduler uses these records indefinitely until changed.</p>
+<div class="build-help-grid"><div><h3>How to use Scheduling Profile</h3><p>Choose an employee, set their unique color, qualified stations, eligible shifts, and weekly can-work / cannot-work patterns. These rules filter employees when a chef fills grey schedule blueprint slots.</p></div><div><h3>Why useful</h3><p>The chef can build schedules from valid people only, while still having override tools when needed. It keeps availability out of text threads and inside the schedule builder.</p></div></div>
+<div class="card-head wrap"><div><h2>Team member profiles / schedule maker</h2><p class="muted">Weekly can-work and can't-work shift patterns are saved inside each employee profile and used indefinitely until changed.</p></div><div class="inline-row"><label class="inline-label">Profile employee <select id="teamProfileUserSelect"></select></label><label class="inline-label">Week of <input id="teamProfileWeekStart" type="date"/></label><button class="ghost" id="refreshTeamProfileBtn" type="button">Refresh profile</button></div></div>
+<div class="result-box" id="teamProfileScheduleSummary"></div>
+<form class="form-card inner-form" id="employeeScheduleProfileForm"><h3>Employee BUILD → scheduling profile</h3><input id="scheduleProfileUserId" name="user_id" type="hidden"/><div class="form-grid"><label>Employee name <input id="scheduleProfileEmployeeName" name="employee_name" placeholder="Employee name"/></label><label>Assigned color <input name="schedule_color" type="color" value="#2f6fed"/></label><label>Qualified stations <select id="scheduleProfileStationSelect" multiple="" size="6"></select><input name="qualified_stations" type="hidden"/><span class="field-help">Pulled from BUILD → Station Builder. Hold Ctrl/Cmd to select more than one.</span></label><label>Eligible shifts <select id="scheduleProfileShiftSelect" multiple="" size="6"></select><input name="eligible_shifts" type="hidden"/><span class="field-help">Pulled from BUILD → Schedule BUILD / Blueprint Maker.</span></label></div><button class="primary">Save employee schedule profile</button></form>
+<div class="grid two">
+<form class="form-card inner-form weekly-availability-form" id="profileCanWorkForm"><h3>Add weekly can-work shift to profile</h3><input id="profileCanWorkUserSelect" name="user_id" type="hidden"/><input name="status" type="hidden" value="can_work"/><div class="form-grid"><label>Day <select name="day_of_week" required=""><option value="0">Monday</option><option value="1">Tuesday</option><option value="2">Wednesday</option><option value="3">Thursday</option><option value="4">Friday</option><option value="5">Saturday</option><option value="6">Sunday</option></select></label><label>Shift <select name="shift_label"><option value="Breakfast">Breakfast</option><option value="Lunch">Lunch</option><option value="Dinner">Dinner</option><option value="Prep">Prep</option><option value="Close">Close</option><option value="Any shift">Any shift</option><option value="Custom">Custom</option></select></label><label>Start time <input name="start_time" required="" type="time"/></label><label>End time <input name="end_time" required="" type="time"/></label></div><label>Label shown in scheduler <input name="label" placeholder="Preferred shift, can close, prep only"/></label><button class="primary">Save weekly can-work profile shift</button></form>
+<form class="form-card inner-form weekly-availability-form" id="profileCannotWorkForm"><h3>Add weekly can't-work shift to profile</h3><input id="profileCannotWorkUserSelect" name="user_id" type="hidden"/><input name="status" type="hidden" value="cannot_work"/><div class="form-grid"><label>Day <select name="day_of_week" required=""><option value="0">Monday</option><option value="1">Tuesday</option><option value="2">Wednesday</option><option value="3">Thursday</option><option value="4">Friday</option><option value="5">Saturday</option><option value="6">Sunday</option></select></label><label>Shift <select name="shift_label"><option value="Breakfast">Breakfast</option><option value="Lunch">Lunch</option><option value="Dinner">Dinner</option><option value="Prep">Prep</option><option value="Close">Close</option><option value="Any shift">Any shift</option><option value="Custom">Custom</option></select></label><label>Start time <input name="start_time" required="" type="time"/></label><label>End time <input name="end_time" required="" type="time"/></label></div><label>Label / reason <input name="label" placeholder="School, second job, unavailable, no closes"/></label><button class="primary">Save weekly can't-work profile shift</button></form>
+</div>
+<div class="list" id="teamProfileScheduleBlocks"></div>
+</section>
+<section class="build-page card wide subpage-block" data-subpage="schedule" id="buildChefSchedulerCard"><h2>BUILD → Schedule BUILD</h2><p class="muted">Create the restaurant's repeating schedule blueprint here: days open, shift labels, station coverage, hours, and employees needed. These saved blueprint slots appear as grey needed-shift boxes in the Scheduler UI for assignment/offering.</p><div class="demo-hours-card"><strong>Demo restaurant hours loaded:</strong> Mon–Thu 11 AM–10 PM · Fri–Sat 11 AM–11:30 PM · Sun 9 AM–3 PM brunch. The demo scheduler is pre-filled so customers can click grey slots without building 80 shifts from scratch.</div><div class="build-help-grid"><div><h3>How to use Schedule BUILD</h3><p>Create the weekly coverage blueprint by day, shift, station, start/end time, and employees needed.</p></div><div><h3>Why useful</h3><p>The scheduler starts with grey required slots instead of a blank calendar, so the chef only fills needed coverage.</p></div></div><div class="embedded-build-tool schedule-builder-card leader-only">
+<div class="card-head wrap">
+<div><h2>Schedule BUILD → Blueprint Builder</h2><p class="muted">Build the normal weekly coverage map: choose open days, shift type, station, hours, and how many employees are needed. These blueprint slots become grey boxes in the Scheduler UI and are assigned or offered there.</p></div>
+</div>
+<form class="form-card inner-form" id="schedulerBlueprintForm">
+<div class="form-grid">
+<label>Days open / needed
+                <select multiple="" name="days" required="" size="7">
+<option value="0">Monday</option><option value="1">Tuesday</option><option value="2">Wednesday</option><option value="3">Thursday</option><option value="4">Friday</option><option value="5">Saturday</option><option value="6">Sunday</option>
+</select>
+</label>
+<label>Shift tool <select id="blueprintShiftLabel" name="shift_label"><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Prep</option><option>Close</option><option>Custom</option></select></label>
+<label>Station tool <select id="blueprintStationSelect" name="station" required=""></select></label>
+<label>Start hour <input name="start_time" required="" type="time"/></label>
+<label>End hour <input name="end_time" required="" type="time"/></label>
+<label>Employees needed <input min="1" name="employees_needed" type="number" value="1"/></label>
+</div>
+<label>Blueprint notes <input name="notes" placeholder="Example: two people on Cold Prep for Friday lunch"/></label>
+<input id="blueprintAdjustScope" name="adjust_scope" type="hidden" value="day"/>
+<div class="blueprint-adjust-row"><span class="muted tiny">ADJUST changes saved timeframes for the selected shift/station.</span><button class="ghost active" data-blueprint-adjust-scope="day" type="button">CHANGE FOR DAY</button><button class="ghost" data-blueprint-adjust-scope="week" type="button">CHANGE FOR WEEK</button><button class="ghost" data-blueprint-adjust-scope="indefinitely" type="button">CHANGE INDEFINITELY</button></div>
+<div class="row"><button class="ghost" data-build-action="adjust" type="submit">ADJUST</button><button class="primary" data-build-action="submit" type="submit">SUBMIT</button></div>
+</form>
+<div class="list compact-list" id="blueprintList"></div>
+</div></section>
+</div>
+</div>
+</section>
+<section class="view" id="inventory">
+<article class="card wide tool-intro"><h2>Inventory</h2><p class="muted">This top-menu area is for USING inventory, not building it. ON HAND shows what is available across in-use and storage. STORAGE shows what is physically in-house but not stocked to stations. PREP ESTIMATOR projects what will be consumed when submitted prep sheets are completed. UNTIL NEXT DELIVERY subtracts prep and expected POS usage so the chef can see what will be left before the vendor shows up.</p></article><article class="card wide subpage-info" id="subpageInfoCard"><p class="eyebrow">Selected tool</p><h2>Inventory operating pages</h2><p class="muted">Inventory is the live view of what the restaurant has, what is stocked into stations, what is still in storage, and what will remain after prep and forecasted usage.</p><div class="grid three tight-info"><div><h3>How to use</h3><p>Choose ON HAND, STORAGE, PREP ESTIMATOR, UNTIL NEXT DELIVERY, PAR, or WATCHLIST from the dropdown.</p></div><div><h3>What it ties into</h3><p>Manual Inventory, Prep uploads, Station closeout, Deliveries, Vendor Orders, Recipes, Plates, and POS usage.</p></div><div><h3>Why it saves money</h3><p>It shows shortages before they become 86s and helps prevent over-ordering items already sitting in storage.</p></div></div></article><div class="subpage-bar" data-subpage-bar="inventory" id="inventorySubpageBar"><button data-subpage-select="onhand" type="button">ON HAND</button><button data-subpage-select="storage" type="button">STORAGE</button><button data-subpage-select="prep" type="button">PREP ESTIMATOR</button><button data-subpage-select="delivery" type="button">UNTIL NEXT DELIVERY</button><button data-subpage-select="par" type="button">PAR / BELOW PAR</button><button data-subpage-select="watchlist" type="button">WATCHLIST / ORDER RISK</button></div>
+<div class="grid two">
+<form class="card form-card leader-only build-tool-live-source" data-build-mount="buildVendorToolMount" id="vendorForm">
+<h2>Add vendor</h2>
+<label>Vendor name <input name="name" placeholder="FreshPoint Produce" required=""/></label>
+<div class="form-grid">
+<label>Order days <input name="order_days" placeholder="Mon,Thu"/></label>
+<label>Delivery days <input name="delivery_days" placeholder="Tue,Fri"/></label>
+<label>Cutoff <input name="cutoff_time" placeholder="21:00"/></label>
+<label>Lead days <input min="0" name="lead_days" placeholder="1" type="number"/></label>
+</div>
+<label>Email <input name="email" placeholder="orders@vendor.com" type="email"/></label>
+<button class="primary">Save vendor</button>
+</form>
+<form class="card form-card leader-only build-tool-form build-tool-live-source" data-build-mount="buildInventoryToolMount" id="productForm">
+<h2>BUILD → Inventory Tool</h2>
+<p class="muted">Keep this simple: item name, amount per quantity, quantity in storage, and par. Advanced supplier and shelf-life fields are optional and help order sheets and look-ahead forecasting.</p>
+<input name="id" type="hidden"/>
+<label>Item name <input name="name" placeholder="Black Beans #10 Can" required=""/></label>
+<div class="form-grid">
+<label>Category <input name="category" placeholder="Dry Goods"/></label>
+<label>Station <input list="stationOptions" name="station" placeholder="Cold Prep"/></label>
+<label>LOCATION / stock area <select id="productLocationSelect" name="stock_location"></select><input list="stockLocationOptions" name="stock_location_custom" placeholder="Or type a custom stock area"/></label>
+<label>Recipe / base unit <input name="unit" placeholder="cup, lb, spear, each"/><span class="field-help">Used by Recipe Builder for costing and recipe math.</span></label>
+<label>Amount per quantity <input name="package_qty" placeholder="40" step="0.001" type="number"/></label>
+<label>Quantity in storage <input name="current_qty" placeholder="0" step="0.001" type="number"/></label>
+<label>Par level <input name="par_level" placeholder="0" step="0.001" type="number"/></label>
+</div>
+<details class="advanced-fields"><summary>Optional supplier, reorder, and shelf-life details</summary>
+<div class="form-grid">
+<label>Reorder point <input name="reorder_point" placeholder="0" step="0.001" type="number"/></label>
+<label>Supplier unit / label <input name="package_unit" placeholder="#10 can, case, box, bunch"/><span class="field-help">Shown as the read-only order unit in COUNT → PAR TO ORDER.</span></label>
+<label>Supplier unit price <input name="package_price" placeholder="0.00" step="0.01" type="number"/></label>
+<label>Minimum order size <input name="min_order_size" placeholder="1" step="0.001" type="number"/></label>
+<label>Units in one minimum order <input name="units_per_min_order" placeholder="10" step="0.001" type="number"/></label>
+<label>Shelf life days <input name="shelf_life_days" placeholder="3" type="number"/></label>
+</div>
+<label>Vendor <select id="productVendorSelect" name="vendor_id"></select></label>
+<label>Notes <textarea name="notes" placeholder="Example: #10 can contains 40 cups, case contains 88 lemons, box contains 120 spears"></textarea></label>
+</details>
+<div class="row"><button class="ghost adjust-build" data-build-action="adjust" type="submit">ADJUST</button><button class="primary submit-build" data-build-action="submit" type="submit">SUBMIT</button></div>
+</form>
+</div>
+<article class="card wide subpage-block" data-subpage="onhand storage"><div class="card-head"><h2>Stockroom inventory checklist</h2><button class="ghost" id="printInventoryBtn">Print current view</button></div><div id="inventoryTable"></div></article>
+<article class="card wide subpage-block" data-subpage="onhand storage prep delivery par watchlist" id="inventorySheetTabsCard">
+<div class="card-head wrap"><div><h2>Inventory Sheet</h2><p class="muted">Live inventory split into storage, in-use, prep impact, total after prep, and PAR risk. This updates when prep is submitted, stations are restocked, or deliveries are received.</p></div><button class="ghost" id="refreshInventorySheetBtn" type="button">Refresh sheet</button></div>
+<div class="pill-tabs" id="inventorySheetTabs">
+<button class="active" data-inventory-tab="onhand">ON HAND</button>
+<button data-inventory-tab="inuse">IN-USE</button>
+<button data-inventory-tab="storage">STORAGE</button>
+<button data-inventory-tab="prep">PREP</button>
+<button data-inventory-tab="total">TOTAL</button>
+<button data-inventory-tab="par">PAR</button>
+<button data-inventory-tab="delivery">UNTIL NEXT DELIVERY</button>
+<button data-inventory-tab="watchlist">WATCHLIST / ORDER RISK</button></div>
+<div class="mini-kpi-grid" id="inventorySheetSummary"></div>
+<div class="table-wrap" id="inventorySheetTable"></div>
+</article>
+<article class="card wide subpage-block" data-subpage="watchlist" id="inventoryWatchlistCard">
+<div class="card-head wrap"><div><h2>Watchlist / Order Risk</h2><p class="muted">Inventory-only risk list. These are products that may hit par, reorder point, or shortage once prep sheets, POS forecast, and delivery timing are considered.</p></div><button class="ghost" id="refreshInventoryWatchlistBtn" type="button">Refresh risk</button></div>
+<div class="grid two"><div><h3>Order risk from look-ahead</h3><div class="list" id="inventoryOrderRiskList"></div></div><div><h3>At / below par after prep</h3><div class="list" id="inventoryParRiskList"></div></div></div>
+</article>
+</section>
+
+<section class="view" id="count">
+<article class="card wide tool-intro">
+<h2>COUNT</h2>
+<p class="muted">COUNT is the physical inventory and order-building workflow. Locations come from BUILD → Inventory Item Builder. The chef or authorized employee can count what is physically in each stock area, see estimated use until future deliveries, write order quantities, and turn those counts into vendor sheets.</p>
+</article>
+<article class="card wide subpage-info" id="subpageInfoCard"><p class="eyebrow">COUNT subpage</p><h2>All stock areas</h2><p class="muted">Choose a stock area to count. HAVE and ORDER are writable; units and estimates are read-only calculations from Inventory, Prep, Plates, Recipes, Vendors, POS, and delivery timing.</p></article>
+<article class="card wide subpage-block" data-subpage="areas suggested vendors optimizer" id="countControlsCard">
+<div class="count-toolbar">
+<label>Forecast window <select id="countForecastDays"><option value="1">1 day</option><option value="2">2 days</option><option value="3">3 days</option><option value="4">4 days</option><option value="5">5 days</option><option value="6">6 days</option><option value="7" selected>7 days</option></select></label>
+<button class="ghost" id="refreshCountBtn" type="button">Refresh COUNT</button>
+</div>
+</article>
+<article class="card wide subpage-block" data-subpage="areas" id="countStockAreaCard">
+<div class="card-head wrap"><div><h2>ALL STOCK AREA(s)</h2><p class="muted">Tabs are created from each item’s LOCATION in Inventory Builder. Use this for walk-in, dry storage, freezer, lowboy, and station storage counts.</p></div><button class="primary" id="saveCountAreaBtn" type="button">Save counted HAVE values</button></div>
+<div class="pill-tabs" id="countLocationTabs"></div>
+<div class="table-wrap" id="countStockAreaTable"></div>
+</article>
+<article class="card wide subpage-block" data-subpage="suggested" id="countSuggestedParCard">
+<div class="card-head wrap"><div><h2>SUGGESTED PAR TO ORDER</h2><p class="muted">Items below PAR, below reorder, at 86 risk, or watchlist after prep/POS/delivery math. PAR TO ORDER is intentionally blank or editable because this is a chef decision, not a hard rule.</p></div><button class="ghost" id="copySuggestedParBtn" type="button">Copy suggested quantities</button></div>
+<div class="table-wrap" id="countSuggestedTable"></div>
+<div class="row end"><button class="primary" id="fillOrderBtn" type="button">FILL ORDER</button></div>
+</article>
+<article class="card wide subpage-block" data-subpage="vendors" id="countVendorSheetsCard">
+<div class="card-head wrap"><div><h2>Vendor order sheets</h2><p class="muted">Items from COUNT are grouped by each item’s vendor. Print, save, or download individual vendor sheets, or aggregate everything into one vendor-organized file.</p></div><div class="row"><button class="ghost" id="printCountVendorBtn" type="button">PRINT</button><button class="ghost" id="downloadCountVendorBtn" type="button">DOWNLOAD CSV</button><button class="primary" id="aggregateCountVendorBtn" type="button">AGGREGATE</button></div></div>
+<div class="vendor-deadline-panel"><h3>VENDORS in forecast window</h3><p class="muted">Delivery deadlines are calculated from the current date and selected forecast window. Flashing vendor cards indicate emergency order risk, expected 86 before delivery, or possible 86 between this delivery and the following delivery.</p><div class="count-action-links"><button class="primary" type="button" data-count-nav="areas">Enter ORDER quantities in ALL STOCK AREA(s)</button><button class="ghost" type="button" data-count-nav="suggested">Enter PAR TO ORDER quantities in SUGGESTED PAR TO ORDER</button></div><p class="fine-print">Use these buttons to jump to the page where order quantities are entered. Vendor cards and vendor sheets appear after ORDER / PAR TO ORDER values are entered.</p><div class="vendor-deadline-grid" id="countVendorDeadlineGrid"></div></div><div id="countVendorSheets"></div>
+</article>
+<article class="card wide subpage-block" data-subpage="optimizer" id="countPriceOptimizerCard">
+<div class="card-head wrap"><div><h2>PRICE OPTIMIZER</h2><p class="muted">Estimator only. Enter a budget and Chef Ledger ranks items by 86 risk, need, watchlist, could-wait, and expected usage. It suggests adjusted order quantities to get close to budget, but actual performance can differ from algorithmic estimates.</p></div></div>
+<div class="form-grid optimizer-budget-grid"><label>Budget <input id="countBudgetInput" type="number" step="0.01" placeholder="1500.00"/></label><div class="cost-if-all-par"><span>COST IF ALL PAR FROM COUNT</span><strong id="countAllParCostTotal">$0.00</strong></div><label>Optimization style <select id="countBudgetMode"><option value="conservative">Protect 86 / needed items first</option><option value="balanced">Balanced</option><option value="aggressive">Cut deeper from watchlist/could-wait</option></select></label></div>
+<button class="primary" id="runCountOptimizerBtn" type="button">Run price optimizer estimate</button>
+<p class="fine-print">Estimator notice: Chef Ledger is not responsible if service performance, sales, spoilage, delivery changes, vendor substitutions, or prep behavior differs from expected results determined by site algorithms.</p>
+<div class="table-wrap" id="countOptimizerResult"></div>
+</article>
+</section>
+
+<section class="view" id="recipes">
+<article class="card wide tool-intro"><h2>Recipes &amp; Plates</h2><p class="muted">Recipes turn inventory items into costed batch cards. Plates combine recipes and items into sellable menu items so the chef can see cost per recipe, cost per plate, and which ingredient is driving margin.</p><p class="muted">This centralizes ingredient lookup, portion math, recipe cards, and food-cost analysis into one workflow instead of rewriting the same numbers across a notebook, spreadsheet, and POS export.</p></article><article class="card wide subpage-info" id="subpageInfoCard"><p class="eyebrow">Selected tool</p><h2>Recipes &amp; Plates operating pages</h2><p class="muted">Use this area to read recipe cards, view finished plate pictures, review menu-item cost, and adjust recipe or plate cost from the records built by the chef.</p><div class="grid three tight-info"><div><h3>How to use</h3><p>Choose a recipe-card, plate-picture, menu-item, or cost-adjustment subpage from the dropdown.</p></div><div><h3>What it ties into</h3><p>Inventory Items, Recipe BUILD, Plate BUILD, Prep templates, POS import, and food-cost reports.</p></div><div><h3>Why it saves money</h3><p>It makes portion cost visible before service, so chefs catch margin problems before the menu loses money.</p></div></div></article><div class="subpage-bar" data-subpage-bar="recipes" id="recipesSubpageBar"><button data-subpage-select="cards" type="button">RECIPE CARDS</button><button data-subpage-select="pictures" type="button">PLATE PICTURES</button><button data-subpage-select="plates" type="button">PLATES / MENU ITEMS</button><button data-subpage-select="optimizer" type="button">ADJUST PLATE / RECIPE COST</button></div>
+<div class="grid two">
+<form class="card form-card build-tool-live-source" data-build-mount="buildRecipeToolMount" id="recipeForm">
+<h2>Create recipe / batch card</h2>
+<label>Recipe title <input name="name" placeholder="Taco Salad" required=""/></label>
+<div class="form-grid">
+<label>Station <input list="stationOptions" name="station" placeholder="Cold Prep"/></label>
+<label>Yield / plates made <input name="yield_qty" placeholder="24" step="0.001" type="number"/></label>
+<label>Portion unit <input name="portion_unit" placeholder="plate"/></label>
+<label>Menu price <input name="menu_price" placeholder="14.00" step="0.01" type="number"/></label>
+<label>Shelf life days <input name="shelf_life_days" placeholder="3" type="number"/></label>
+<label>Storage container after made <input name="storage_container" placeholder="Quart deli, cambro, squeeze bottle"/></label><label>In-station container <input name="station_container" placeholder="1/6 pan, bottle, salad box"/></label><label>Container size <input name="container_size_qty" placeholder="32" step="0.001" type="number"/></label><label>Container unit <input name="container_size_unit" placeholder="oz, cup, gal, 1/6 pan"/></label></div>
+<label>Notes <textarea name="notes" placeholder="Prep method, portion notes, allergen notes"></textarea></label>
+<div class="row"><label class="inline-check"><input id="recipeStepsToggle" type="checkbox"/> Turn on recipe steps</label><button class="ghost" hidden="" id="addRecipeStepBtn" type="button">+ STEP</button></div>
+<div class="step-builder" hidden="" id="recipeStepRows"></div>
+<h3>Ingredients</h3>
+<div class="stack" id="recipeItemRows"></div>
+<button class="ghost" id="addRecipeItemBtn" type="button">+ Add ingredient line</button>
+<div class="row"><button class="ghost adjust-build" data-build-action="adjust" type="submit">ADJUST</button><button class="primary submit-build" data-build-action="submit" type="submit">SUBMIT</button></div>
+</form>
+<article class="card subpage-block" data-subpage="optimizer">
+<h2>Target-cost recipe optimizer</h2>
+<p class="muted">Select a recipe and enter a target recipe or plate cost. Chef Ledger scales every ingredient proportionally, then rounds to kitchen-friendly increments.</p>
+<label>Recipe <select id="optimizerRecipe"></select></label>
+<div class="form-grid">
+<label>Target cost <input id="optimizerTarget" placeholder="7.50" step="0.01" type="number"/></label>
+<label>Target type <select id="optimizerType"><option value="recipe">Recipe total</option><option value="plate">Per plate</option></select></label>
+</div>
+<button class="primary" id="runOptimizerBtn">Run optimizer</button>
+<div class="result-box" id="optimizerResult"></div>
+</article>
+</div>
+<article class="card wide leader-only subpage-block build-tool-live-source" data-build-mount="buildPlateToolMount" data-subpage="plates" id="dishBuilderCard">
+<div class="card-head wrap"><div><h2>Dish / plate builder</h2><p class="muted">Build a sellable menu item from multiple recipes and inventory items. This is what POS sales should map to for per-plate cost and portion-control analysis.</p></div></div>
+<form class="form-card inner-form" id="dishForm">
+<div class="form-grid">
+<label>Plate / menu item title <input name="name" placeholder="Taco Salad Plate" required=""/></label>
+<label>Station <input list="stationOptions" name="station" placeholder="Cold Prep"/></label>
+<label>Menu price <input name="menu_price" placeholder="15.00" step="0.01" type="number"/></label>
+<label>Notes <input name="notes" placeholder="POS name, garnish notes, menu category"/></label>
+<label>Finished plate picture URL <input name="photo_url" placeholder="https://... or local image path"/></label></div>
+<h3>Recipes and items used on this plate</h3>
+<div class="stack" id="dishComponentRows"></div>
+<button class="ghost" id="addDishComponentBtn" type="button">+ Add recipe/item to plate</button>
+<div class="row"><button class="ghost adjust-build" data-build-action="adjust" type="submit">ADJUST</button><button class="primary submit-build" data-build-action="submit" type="submit">SUBMIT</button></div>
+</form>
+<div class="recipe-grid" id="dishList"></div>
+</article>
+<article class="card wide subpage-block" data-subpage="cards"><div class="card-head"><h2>Recipe cards and cost breakdowns</h2><button class="ghost" id="printRecipesBtn">Print recipe cards</button></div><div class="recipe-grid" id="recipeList"></div></article><article class="card wide subpage-block" data-subpage="pictures" id="platePictureGallery"><div class="card-head"><h2>Finished Plate Pictures</h2><p class="muted">Pictures uploaded/linked in BUILD → Menu Item / Plate Builder appear here as a read-only plating reference for the kitchen.</p></div><div class="recipe-grid" id="platePictureGrid"></div></article>
+</section>
+<section class="view" id="prep">
+<article class="card wide tool-intro"><h2>Prep</h2><p class="muted">PREPSHEET is the single station workflow for what needs prep, what was filled, what was closed out, and whether the station is ready for service. BUILD PREP still creates the recurring station template; this PREP page is where the restaurant uses it during the shift.</p></article><article class="card wide subpage-info" id="subpageInfoCard"><p class="eyebrow">Selected tool</p><h2>PREPSHEET</h2><p class="muted">FILL / CLOSEOUT / PREP CHECK combines the old list-to-prepsheet and closeout steps into one station checklist. READY FOR SERVICE can be enabled by the chef profile if the restaurant wants a second manager/station-readiness check.</p><div class="grid three tight-info"><div><h3>How to use</h3><p>Choose a station, load the station list, enter what was left/restocked, check PREP? for items that need to be made, keep notes beside the item, then submit once.</p></div><div><h3>What it ties into</h3><p>BUILD PREP, Recipes, Plates, Inventory, Orders, Station closeout, Master Prep Sheet, and notifications.</p></div><div><h3>Why it saves money</h3><p>It turns one station check into prep demand, storage deduction estimates, in-use visibility, and order risk without employees filling out multiple forms.</p></div></div></article><div class="prep-option-card leader-only"><div><strong>Chef profile option</strong><p class="muted">READY FOR SERVICE is optional. Turn it on if the restaurant wants a second readiness check after employees complete fill / closeout / prep check.</p></div><label class="switch-line"><input id="readyForServiceToggle" type="checkbox"/> Show READY FOR SERVICE tab</label></div><div class="prep-workflow-tabs" id="prepUnifiedWorkflowCard"><button class="active" data-prep-mode="closeout" type="button">FILL / CLOSEOUT / PREP CHECK</button><button data-prep-mode="claim" type="button">CLAIM PREP ITEM</button><button data-prep-mode="ready" data-ready-tab="1" type="button" hidden>READY FOR SERVICE</button></div>
+<article class="card wide build-prep-card leader-only build-tool-live-source" data-build-mount="buildPrepToolMount" id="prepSheetBuildCard">
+<div class="card-head wrap">
+<div>
+<h2>BUILD PREP → Station template from Plates</h2>
+<p class="muted">This is the chef setup page. Select a station and generate from the Menu Item / Plate Builder. Chef Ledger pulls every recipe and direct item used on that station's plates, then saves the recurring checklist employees will use on their PREP page.</p><p class="muted">For each station item, set the minimum amount to keep on station and the station unit/container. Examples: Grill can use steaks, burgers, cutlets, or breasts; Salad can use 1/9 pan, 1/6 pan, or dressing bottle; Dessert can use canisters, shallow half-pan, deep half-pan, or hotel pan. Recipe BUILD provides the default in-station container, but PREP BUILD can override it for the station.</p>
+</div>
+<button class="primary" id="generateStationPrepBtn" type="button">GENERATE FROM PLATES</button>
+</div>
+<div class="form-grid">
+<label>Station <select id="prepBuildStation"></select></label>
+</div>
+<div class="result-box" id="prepBuildPreview"></div>
+</article>
+<div class="modal-backdrop" hidden="" id="prepTemplateModal">
+<div class="modal-card wide-modal">
+<div class="card-head wrap"><div><h2>BUILD PREP station template</h2><p class="muted" id="prepTemplateSubtitle"></p></div><button class="ghost" id="closePrepTemplateBtn" type="button">Close</button></div>
+<div class="small-note">This template is built from Plates assigned to the station. Checked rows are saved to the station template, populate the MASTER PREPSHEET, and update Prep Estimator / Inventory / PAR risk / Order suggestions. The minimum/unit fields are read-only on FILL / CLOSEOUT / PREP CHECK so employees know the station target without guessing.</div>
+<div class="prep-checklist-grid" id="prepTemplateRows"></div>
+<div class="row end"><button class="primary" id="savePrepTemplateBtn" type="button">Save station prep template</button></div>
+</div>
+</div>
+<article class="card wide employee-portal-card subpage-block legacy-list-to-prep" data-subpage="prepsheet" data-prep-mode-panel="legacy-list" id="employeePrepUploadCard" hidden>
+<div class="card-head wrap">
+<div>
+<h2>PREP → Employee station checklist</h2>
+<p class="muted">Employees select their station and load the chef-built template. They check only the items that need to be prepped, optionally mark urgency, then upload the prep sheet to the chef profile.</p>
+</div>
+<button class="primary" id="loadEmployeePrepBtn" type="button">LOAD STATION PREP</button>
+</div>
+<div class="form-grid">
+<label>Station <select id="employeePrepStation"></select></label>
+<label>Date <input id="employeePrepDate" type="date"/></label>
+<label>Service / shift <select id="employeePrepService"><option value="breakfast">Breakfast</option><option value="lunch">Lunch</option><option selected="" value="dinner">Dinner</option><option value="close">Close</option><option value="all-day">All day</option></select></label>
+</div>
+<div class="prep-checklist-grid" id="employeePrepChecklist"></div>
+<div class="row end"><button class="primary" id="uploadEmployeePrepBtn" type="button">UPLOAD PREPSHEET</button></div>
+</article>
+<article class="card wide leader-only subpage-block ready-service-panel" data-subpage="prepsheet" data-prep-mode-panel="ready" id="chefPrepReviewCard">
+<div class="card-head wrap">
+<div>
+<h2>Chef Prep Review → Station-organized uploads</h2>
+<p class="muted">Uploaded employee prep sheets collect here by station. Send them to next-shift employees, print, or save to device after every station has submitted.</p>
+</div>
+<div class="row"><button class="primary" id="sendPrepToNextShiftBtn" type="button">SEND TO NEXT SHIFT EMPLOYEES</button><button class="ghost" id="printPrepReviewBtn" type="button">PRINT</button><button class="ghost" id="savePrepReviewBtn" type="button">SAVE TO DEVICE</button></div>
+</div>
+<div class="station-prep-review" id="chefPrepByStation"></div>
+</article>
+<article class="card wide employee-portal-card subpage-block" data-subpage="prepsheet" data-prep-mode-panel="closeout" id="whileStockingCard">
+<div class="card-head wrap">
+<div>
+<h2>FILL / CLOSEOUT / PREP CHECK</h2>
+<p class="muted">One station screen handles closeout, restock/fill, and the old list-to-prepsheet workflow. Employees enter what is left before restock, what is ready after restock, check PREP? for anything that needs to be made, and leave notes beside each station item. The Min. To Keep On Station and Unit columns come from BUILD PREP and are read-only for employees.</p><p class="muted">Use notes for real handoff events: spoiled product thrown out, spilled dressing, stocked what was left in the cooler, 86 in walk-in but enough for lunch, or anything that explains why the numbers changed. This keeps the end-of-shift protocol in one place instead of making staff restock, walk back and forth, write a prep sheet later, forget an item, and get blamed when it 86s during lunch.</p>
+</div>
+<button class="ghost" id="loadStationCountBtn" type="button">Load station items</button>
+</div>
+<form class="form-card inner-form" id="stationCountForm">
+<div class="form-grid">
+<label>Station <select id="stationCountStation" name="station"></select></label>
+<label>Date <input id="stationCountDate" name="count_date" type="date"/></label>
+<label>Service / shift <select id="stationCountService" name="service_period"><option value="breakfast">Breakfast</option><option value="lunch">Lunch</option><option selected="" value="dinner">Dinner</option><option value="close">Close</option><option value="all-day">All day</option></select></label>
+</div>
+<div class="table-wrap" id="stationCountRows"></div>
+<button class="primary">Submit station count to team leader</button>
+</form>
+<div class="result-box" id="stationCountResult"></div>
+<div class="list compact-list" id="stationCountHistory"></div>
+</article>
+<article class="card wide subpage-block" data-subpage="prepsheet" data-prep-mode-panel="claim" id="claimPrepItemCard"><div class="card-head wrap"><div><h2>CLAIM PREP ITEM</h2><p class="muted">Employees assigned to the shift and physically in the building can claim prep work from the Master Prep List. This keeps high-priority prep visible and reduces the “I thought someone else was making it” problem.</p></div><button class="ghost" id="refreshClaimPrepBtn" type="button">Refresh claim list</button></div><div class="list" id="claimPrepList"></div></article>
+<article class="card wide subpage-block ready-service-panel" data-subpage="prepsheet" data-prep-mode-panel="ready"><div class="card-head"><h2>READY FOR SERVICE → Master Prep Sheet / Live aggregated prep list</h2><div><button class="ghost" id="refreshPrepBtn">Refresh</button><button class="ghost leader-only-inline" id="printPrepBtn">Print selected sheet</button></div></div><div id="prepAggregate"></div></article>
+<article class="card wide subpage-block ready-service-panel" data-subpage="prepsheet" data-prep-mode-panel="ready"><h2>READY FOR SERVICE → Selected sheet tasks</h2><div class="list" id="prepTaskList"></div></article>
+<article class="card wide subpage-block" data-subpage="forecaster" id="prepForecasterCard">
+  <div class="card-head wrap">
+    <div>
+      <h2>PREP → FORECASTER</h2>
+      <p class="muted">Upload saved FILES → POS CSV projection/special profiles, adjust expected plate counts, and add the forecast into prep, inventory, order sheet, and vendor math for a selected date range.</p>
+    </div>
+    <button class="ghost" id="refreshForecasterBtn" type="button">Refresh profiles</button>
+  </div>
+  <div class="grid two">
+    <article class="inner-card">
+      <h3>UPLOAD saved projection profile</h3>
+      <label>Projection/Profile folder <select id="forecasterProfileSelect"></select></label>
+      <div class="result-box" id="forecasterProfilePreview"></div>
+      <h3>Adjust expected plates</h3>
+      <div class="form-grid" id="forecasterAdjustments"></div>
+      <div class="form-grid">
+        <label>Start date <input id="forecasterStartDate" type="date"/></label>
+        <label>End date <input id="forecasterEndDate" type="date"/></label>
+      </div>
+      <button class="primary" id="applyForecasterBtn" type="button">ADD TO PREP</button>
+    </article>
+    <article class="inner-card">
+      <h3>Active forecast / special events</h3>
+      <p class="muted">UNDO reverses inventory impacts and order/vendor sheet pressure, then marks the special canceled.</p>
+      <div class="list compact-list" id="forecasterEventList"></div>
+    </article>
+  </div>
+</article>
+</section>
+<section class="view" id="orders">
+<article class="card wide tool-intro"><h2>Orders</h2><p class="muted">Orders use live inventory, open prep tasks, POS sales, par levels, supplier pack sizes, and delivery schedules to estimate what should be ordered. The numbers are suggestions for the chef, not blind autopilot.</p><p class="muted">This replaces checking prep sheets, guessing tomorrow's sales, counting coolers, and hand-writing vendor orders with one Look Ahead workflow.</p></article><article class="card wide subpage-info" id="subpageInfoCard"><p class="eyebrow">Selected tool</p><h2>Orders operating pages</h2><p class="muted">Orders uses inventory, prep, delivery timing, vendor setup, and POS sales to show what may need to be ordered now or before the next delivery.</p><div class="grid three tight-info"><div><h3>How to use</h3><p>Use NEEDED, VENDOR, DELIVERIES, or POS IMPORT from the dropdown.</p></div><div><h3>What it ties into</h3><p>Vendor BUILD, Inventory BUILD, Manual Inventory, Prep sheets, POS import, and Delivery receiving.</p></div><div><h3>Why it saves money</h3><p>It reduces emergency ordering and overbuying by showing expected use before the vendor arrives.</p></div></div></article><div class="subpage-bar" data-subpage-bar="orders" id="ordersSubpageBar"><button data-subpage-select="deadline" type="button">NEXT DEADLINE</button><button data-subpage-select="order_sheet" type="button">ORDER SHEET</button><button data-subpage-select="needed" type="button">NEEDED</button><button data-subpage-select="vendor" type="button">VENDOR</button><button data-subpage-select="deliveries" type="button">DELIVERIES</button><button data-subpage-select="pos" type="button">POS IMPORT</button></div>
+<article class="card wide subpage-block" data-subpage="deadline" id="ordersNextDeadlineCard"><div class="card-head wrap"><div><h2>Next Deadline</h2><p class="muted">Vendor deadlines are ranked by next order cutoff. Each vendor card shows the items that are below par, expected to 86 before delivery, or projected to fall below par before the following delivery.</p></div><button class="ghost" id="refreshOrderDeadlinesBtn" type="button">Refresh deadlines</button></div><div id="ordersNextDeadlineList"></div></article>
+<article class="card wide subpage-block" data-subpage="order_sheet" id="ordersVendorSheetCard"><div class="card-head wrap"><div><h2>Vendor Order Sheet</h2><p class="muted">Open the order sheet created from COUNT for a specific vendor. The sheet can be printed, downloaded as CSV, or saved as a browser PDF/JPEG from the print dialog.</p></div><div class="row"><select id="orderSheetVendorSelect"></select><button class="ghost" id="printOrderSheetPageBtn" type="button">PRINT</button><button class="ghost" id="downloadOrderSheetPageBtn" type="button">DOWNLOAD CSV</button></div></div><div id="orderSheetVendorBody"></div></article>
+<div class="grid two subpage-block" data-subpage="pos">
+<article class="card">
+<h2>Order forecast</h2>
+<p class="muted">This is the main Chef Ledger difference: projected inventory subtracts open prep tasks and POS expected usage before the next delivery, then rounds the order to supplier pack units.</p>
+<div class="form-grid">
+<label>Minimum forecast days <input id="orderForecastDays" max="14" min="1" type="number" value="3"/></label>
+</div>
+<button class="primary" id="refreshSuggestionsBtn">Refresh suggestions</button>
+<button class="ghost" id="createOrdersBtn">Create vendor orders</button>
+</article>
+<article class="card wide subpage-block" data-subpage="pos"><h2>POS CSV moved to FILES</h2><p class="muted">POS import/export now lives under FILES → POS CSV so all saved/imported documents stay together.</p><button class="primary" data-view="files" data-subpage="pos" type="button">Open FILES → POS CSV</button></article>
+</div>
+<article class="card wide subpage-block" data-subpage="vendor" id="vendorNeededCard"><h2>Vendor → Needed</h2><p class="muted">Vendor-needed lists group order suggestions by the Vendor Builder profile. These estimates update from PREP, POS average plate sales, current STORAGE, and days until next delivery.</p><div class="list" id="vendorNeededList"></div></article><article class="card wide subpage-block" data-subpage="needed"><h2>Suggested order sheet</h2><p class="muted">Columns separate supplier pack ordering from kitchen usage math: supplier unit, pack size, current inventory, prep use, POS forecast use, projected inventory before delivery, par, and projected inventory after ordering.</p><div id="suggestionsTable"></div></article>
+<article class="card wide subpage-block" data-subpage="deliveries"><h2>Saved vendor orders</h2><div class="list" id="ordersList"></div></article>
+</section>
+
+<section class="view" id="files">
+<article class="card wide tool-intro files-hero-card">
+<h2>FILES</h2>
+<p class="muted">FILES is the restaurant document hub: POS CSVs, plate pictures, inventory snapshots, prep sheets, vendor order sheets, menus, and schedules. It keeps the paperwork that normally lives across clipboards, texts, office computers, POS exports, and bulletin boards in one searchable operating record.</p>
+<p class="muted">Use this area to print, save, download, or prepare email-ready files. It helps catch waste early, cross-check who was working a station, and turn yesterday/today/tomorrow prep into one organized handoff.</p>
+</article>
+<article class="card wide subpage-info" id="subpageInfoCard"><p class="eyebrow">FILES subpage</p><h2>FILES landing</h2><p class="muted">Choose a FILES subpage from the dropdown. Each page explains what it stores, how it saves time, and why it helps accountability.</p></article>
+<article class="card wide subpage-block" data-subpage="landing" id="filesLandingCard">
+  <h2>Centralize the paperwork</h2>
+  <div class="grid three tight-info">
+    <div><h3>Why useful</h3><p>Prep sheets, count sheets, order sheets, schedules, menus, and POS files stop living in separate notebooks and computers.</p></div>
+    <div><h3>How it saves money</h3><p>Waste and missed prep show up earlier because FILES compares prep, count, POS, schedules, and vendor timing in one place.</p></div>
+    <div><h3>How it saves time</h3><p>Instead of asking three people for the right document, the chef opens the correct subpage, prints/saves/sends, and moves on.</p></div>
+  </div>
+</article>
+<article class="card wide subpage-block" data-subpage="pos" id="filesPosCard">
+  <div class="card-head wrap"><div><h2>FILES → POS CSV</h2><p class="muted">Store nightly YTD POS CSV files, scan plates, project expected plate counts, and save profiles for PREP → FORECASTER.</p></div><div class="row"><button class="ghost" id="downloadPosExampleBtn" type="button">DOWNLOAD SAMPLE CSV</button></div></div>
+  <div class="storage-meter" id="filesStorageMeterPos"></div>
+  <div class="build-help-grid"><div><h3>Nightly POS library</h3><p>Upload POS CSV files from yesterday, week-to-date, month-to-date, or year-to-date. Chef Ledger scans plate names, dates, quantities, prices, dayparts, and special/promo columns.</p></div><div><h3>Forecast purpose</h3><p>Projection profiles turn sold plates into expected plates by day, week, month, and season so prep and ordering can stop guessing.</p></div></div>
+  <div class="files-pos-layout">
+    <article class="inner-card">
+      <h3>Upload POS CSV file(s)</h3>
+      <div class="form-grid">
+        <label>CSV files <input id="posCsvFileInput" type="file" accept=".csv,text/csv" multiple></label>
+        <label>Upload note <input id="posCsvUploadNote" placeholder="Nightly YTD export, weekend specials, etc."></label>
+      </div>
+      <div class="row wrap"><button class="primary" id="uploadPosCsvFilesBtn" type="button">Upload selected CSV files</button><span class="muted" id="posCsvFileHint">No CSV selected yet.</span></div>
+      <form class="form-card inner-form" id="posImportForm">
+        <label>Paste POS CSV <textarea name="csv" placeholder="date,service_period,recipe,qty,price,special&#10;2026-06-09,dinner,Taco Salad,36,12.00,false&#10;2026-06-10,lunch,Taco Salad,52,10.00,true" rows="6"></textarea></label>
+        <button class="secondary">Paste + Scan POS CSV</button>
+      </form>
+    </article>
+    <article class="inner-card">
+      <div class="row wrap"><h3>SHOW PLATES</h3><button class="ghost" id="selectAllPosPlatesBtn" type="button">Select ALL plates</button><button class="ghost" id="clearPosPlatesBtn" type="button">Clear</button></div>
+      <div class="plate-check-grid" id="posPlateSelector"></div>
+    </article>
+  </div>
+  <div class="grid two">
+    <article class="inner-card">
+      <h3>PROJECTION</h3>
+      <div class="form-grid">
+        <label>Projection sub-tab <select id="posProjectionType"><option value="day">By DAY</option><option value="week" selected>By WEEK</option><option value="month">By MONTH</option><option value="season">By SEASON</option></select></label>
+        <label>Profile name <input id="posProjectionProfileName" placeholder="Weekend taco salad forecast"></label>
+      </div>
+      <div class="row wrap"><button class="primary" id="runPosProjectionBtn" type="button">Run projection</button><button class="ghost" id="savePosProjectionProfileBtn" type="button">Save Profile</button></div>
+      <div class="table-wrap" id="posProjectionResult"></div>
+    </article>
+    <article class="inner-card">
+      <h3>RAN SPECIAL</h3>
+      <label class="checkline"><input id="posSpecialSpecificDays" type="checkbox"> ON SPECIFIC DAY</label>
+      <div class="dow-picker" id="posSpecialDays">
+        <label><input type="checkbox" value="Monday">Mon</label><label><input type="checkbox" value="Tuesday">Tue</label><label><input type="checkbox" value="Wednesday">Wed</label><label><input type="checkbox" value="Thursday">Thu</label><label><input type="checkbox" value="Friday">Fri</label><label><input type="checkbox" value="Saturday">Sat</label><label><input type="checkbox" value="Sunday">Sun</label>
+      </div>
+      <div class="row wrap"><button class="primary" id="runPosSpecialBtn" type="button">View special stats</button><button class="ghost" id="savePosSpecialProfileBtn" type="button">Save Special Profile</button></div>
+      <div class="table-wrap" id="posSpecialResult"></div>
+    </article>
+  </div>
+  <article class="inner-card"><h3>Projection/Profile folder</h3><p class="muted">Saved profiles are ready for PREP → FORECASTER upload in the next workflow. They preserve selected plates, filters, projection values, and special-day stats.</p><div class="list compact-list" id="posProjectionProfiles"></div></article>
+  <article class="inner-card"><h3>Uploaded POS CSV files</h3><div class="list compact-list" id="posCsvFilesList"></div></article>
+</article>
+<article class="card wide subpage-block" data-subpage="pictures" id="filesPicturesCard">
+  <div class="card-head wrap"><div><h2>FILES → Pictures</h2><p class="muted">Upload recipe-card, plate, station, and location pictures into organized folders. Storage limits can be priced into the monthly subscription.</p></div><div class="row"><button class="ghost" id="refreshFilesPicturesBtn" type="button">Refresh</button></div></div>
+  <div class="storage-meter" id="filesStorageMeterPictures"></div>
+  <div class="grid two">
+    <article class="inner-card">
+      <h3>Folder builder</h3>
+      <div class="form-grid">
+        <label>CREATE FOLDER <input id="pictureFolderName" placeholder="Spring menu plates, Grill station, Walk-in shelf labels"></label>
+        <label>Use pictures for <select id="pictureFolderPurpose"><option value="recipe_cards">RECIPE CARDS</option><option value="plates">PLATES</option><option value="stations">STATIONS</option><option value="locations">LOCATIONS</option></select></label>
+        <label>Link/name <input id="pictureLinkedName" placeholder="Taco Salad, Expo, Walk-in A, etc."></label>
+      </div>
+      <input id="pictureUploadInput" type="file" accept="image/*" multiple hidden>
+      <div class="row wrap"><button class="plus-button" id="addPicturesBtn" type="button">+</button><span class="muted" id="pictureUploadHint">Click + to add photo(s), then MAKE FOLDER.</span></div>
+      <button class="primary" id="makePictureFolderBtn" type="button">MAKE FOLDER</button>
+    </article>
+    <article class="inner-card top-tier-post-card">
+      <h3>Top-tier: Create Post</h3>
+      <p class="muted">Centralize linked social pages and generate a refined prompt to paste into your preferred AI model with the selected picture. Live auto-post integrations can attach here later.</p>
+      <div class="form-grid">
+        <label>Instagram link <input id="socialInstagram" placeholder="https://instagram.com/yourrestaurant"></label>
+        <label>Facebook link <input id="socialFacebook" placeholder="https://facebook.com/yourrestaurant"></label>
+        <label>TikTok link <input id="socialTiktok" placeholder="https://tiktok.com/@yourrestaurant"></label>
+        <label>Picture <select id="socialPictureSelect"></select></label>
+        <label>Plate / subject <input id="socialPlateName" placeholder="Taco Salad special"></label>
+        <label>Occasion <input id="socialOccasion" placeholder="Friday dinner special, patio lunch, chef feature"></label>
+        <label>Tone <input id="socialTone" placeholder="refined, warm, chef-led, elegant"></label>
+      </div>
+      <div class="row wrap"><button class="ghost" id="saveSocialLinksBtn" type="button">Save social links</button><button class="primary" id="generateSocialPromptBtn" type="button">Generate Prompt</button></div>
+      <textarea id="socialPromptOutput" rows="8" readonly placeholder="Generated prompt appears here for copy/paste."></textarea>
+    </article>
+  </div>
+  <div class="list compact-list" id="pictureFolderList"></div>
+  <div class="picture-grid" id="filesPictureGrid"></div>
+</article>
+<article class="card wide subpage-block" data-subpage="inventories" id="filesInventoriesCard">
+  <div class="card-head wrap"><div><h2>FILES → Saved Inventories</h2><p class="muted">Tier-based rolling file storage for inventory saves. PREP SHEET shows the rolling week. COUNT saves full inventory snapshots up to the tier limit; the oldest file rolls off when the cap is reached.</p></div><div class="row"><button class="ghost" id="exportInventoryBtn" type="button">Export Inventory CSV</button><button class="ghost" id="saveInventorySnapshotBtn" type="button">SAVE INVENTORY</button><button class="primary" id="saveCountSnapshotBtn" type="button">SAVE COUNT</button></div></div>
+  <div class="small-note" id="inventoryRetentionInfo"></div>
+  <div class="grid two">
+    <article class="inner-card"><h3>PREP SHEET · rolling week</h3><div class="list compact-list" id="filesInventoryPrepWeek"></div></article>
+    <article class="inner-card"><h3>COUNT tab · full inventory count saves</h3><div class="list compact-list" id="filesInventoryCountSnapshots"></div></article>
+  </div>
+  <article class="inner-card"><h3>Saved inventory files</h3><div class="list compact-list" id="filesInventorySavedSnapshots"></div></article>
+  <div class="table-wrap" id="filesInventorySnapshot"></div>
+</article>
+<article class="card wide subpage-block" data-subpage="prep" id="filesPrepCard">
+  <div class="card-head wrap"><div><h2>FILES → PREP SHEETs</h2><p class="muted">Yesterday, Today, and Tomorrow prep sheets are grouped by station with notes attached. Red means 86, orange means needed now, green means no prep needed, and purple flags possible mismatch between station input, POS sales, and estimator math.</p></div><div class="row"><button class="ghost" id="printFilesPrepBtn" type="button">PRINT</button><button class="ghost" id="downloadFilesPrepBtn" type="button">DOWNLOAD</button><button class="primary" id="emailFilesPrepBtn" type="button">EMAIL READY</button></div></div>
+  <div class="pill-tabs" id="filesPrepDayTabs"><button data-files-prep-day="yesterday" type="button">Yesterday</button><button class="active" data-files-prep-day="today" type="button">Today</button><button data-files-prep-day="tomorrow" type="button">Tomorrow</button></div>
+  <div class="list" id="filesPrepList"></div>
+</article>
+<article class="card wide subpage-block" data-subpage="vendors" id="filesVendorCard">
+  <div class="card-head wrap"><div><h2>FILES → VENDOR</h2><p class="muted">Choose a vendor and open the current order sheet created from COUNT. Print, download, or prepare an email-ready copy.</p></div><div class="row"><select id="filesVendorSelect"></select><button class="ghost" id="printFilesVendorBtn" type="button">PRINT</button><button class="ghost" id="downloadFilesVendorBtn" type="button">DOWNLOAD CSV</button><button class="primary" id="emailFilesVendorBtn" type="button">EMAIL READY</button></div></div>
+  <div id="filesVendorBody"></div>
+</article>
+<article class="card wide subpage-block" data-subpage="deliveries" id="filesDeliveriesCard">
+  <div class="card-head wrap"><div><h2>FILES → DELIVERIES</h2><p class="muted">Save delivery/order files based on what was on the order sheet. Use VENDOR ORDERS to select a vendor and see delivery/order dates, with rolling retention by subscription tier.</p></div><div class="row"><select id="deliveriesVendorSelect"></select><button class="primary" id="saveSuggestedDeliveryRecordBtn" type="button">SAVE CURRENT DELIVERY FILE</button></div></div>
+  <div class="small-note" id="deliveriesRetentionInfo"></div>
+  <div class="grid two">
+    <article class="inner-card"><h3>VENDOR ORDERS · dates delivered/created</h3><div class="list compact-list" id="deliveryOrderDatesList"></div></article>
+    <article class="inner-card"><h3>Saved delivery files</h3><div class="list compact-list" id="savedDeliveryRecordsList"></div></article>
+  </div>
+</article>
+<article class="card wide subpage-block" data-subpage="menu" id="filesMenuCard">
+  <div class="card-head wrap"><div><h2>FILES → MENU</h2><p class="muted">Menu access changes by subscription tier: starter CSV plate list, shift-grouped menus, picture/ingredient menus, then full recipe-card and social-prompt access.</p></div><div class="row"><button class="ghost" id="downloadFilesMenuCsvBtn" type="button">DOWNLOAD MENU CSV</button><button class="ghost" id="exportRecipesBtn" type="button">Export Recipes CSV</button><button class="ghost" id="printFilesMenuBtn" type="button">PRINT</button></div></div>
+  <div class="list" id="filesMenuList"></div>
+</article>
+<article class="card wide subpage-block" data-subpage="qr" id="filesQrCard">
+  <div class="card-head wrap"><div><h2>FILES → QR CODE MAKER</h2><p class="muted">Top-tier tool for attaching recipe QR codes to printed recipe cards/books. Employees scan the code to open the full portable recipe in the app instead of carrying around paper pages.</p></div><button class="ghost" id="refreshQrCodesBtn" type="button">Refresh</button></div>
+  <div class="small-note" id="qrTierInfo"></div>
+  <div class="form-grid"><label>Recipe <select id="qrRecipeSelect"></select></label></div>
+  <button class="primary" id="createRecipeQrBtn" type="button">CREATE RECIPE QR CODE</button>
+  <div class="list compact-list" id="qrCodeList"></div>
+</article>
+<article class="card wide subpage-block" data-subpage="schedules" id="filesScheduleCard">
+  <div class="card-head wrap"><div><h2>FILES → SCHEDULE(s)</h2><p class="muted">Previous and current schedule files help pinpoint who was on a station when a waste, spoilage, or process issue happened. Schedules can be printed, posted, or sent without anyone driving in to check a bulletin board.</p></div><div class="row"><button class="ghost" id="printFilesScheduleBtn" type="button">PRINT</button><button class="ghost" id="downloadFilesScheduleBtn" type="button">DOWNLOAD</button></div></div>
+  <div class="schedule-file-controls"><label>Schedule file window <select id="filesScheduleWindow"><option value="current">Current month</option><option value="previous">Previous month</option></select></label></div>
+  <div class="list" id="filesScheduleList"></div>
+</article>
+</section>
+
+<section class="view" id="scheduler">
+<article class="card wide tool-intro manager-only"><h2>Manager → Schedule planner</h2><p class="muted">The scheduler now works in two layers: the chef builds a weekly blueprint of the shifts and stations the restaurant needs, then the planner turns those blueprint slots into assigned shifts. Employee profile BUILD records control station qualifications, eligible shifts, weekly can-work / can't-work patterns, schedule colors, and override warnings.</p><p class="muted">The daily planner opens one day at a time for a larger, fine-dining control-room view. Grey boxes are required slots from the chef blueprint. Use the Day / Week / Station / Employee filter bar to break the schedule down, for example Wednesday next week + Grill. The demo schedule is pre-filled, with one extra grey demo slot left clickable; clicking any assigned shift opens a side panel showing the employee, rolling pay-period hours, overtime/request-off warnings, chef notes, and an OFFER SHIFT workflow.</p></article><article class="card wide subpage-info" id="subpageInfoCard"><p class="eyebrow">Selected tool</p><h2>Manager schedule operating pages</h2><p class="muted">Scheduler uses the Schedule BUILD blueprint and Employee Profile BUILD availability to assign, offer, print, and send shifts.</p><div class="grid three tight-info"><div><h3>How to use</h3><p>Choose the schedule planner, fill-shift/offers view, shift approvals, or hours/overtime view. Employee availability setup lives under BUILD → Employee Profile BUILD.</p></div><div><h3>What it ties into</h3><p>Employee profiles, stations, shift blueprint, time-off requests, access codes, and notifications.</p></div><div><h3>Why it saves money</h3><p>It reduces accidental scheduling conflicts and makes weekly schedule changes visible to the team quickly.</p></div></div></article>
+<article class="card wide schedule-builder-card schedule-write-only schedule-build-pointer"><div class="card-head wrap"><div><h2>Schedule BUILD lives in BUILD</h2><p class="muted">Use BUILD → Schedule BUILD to create or adjust the grey needed-shift blueprint. This Scheduler page is for using those blueprint slots: click, assign, offer, send, print, or save the schedule.</p></div><button class="primary" data-focus="buildChefSchedulerCard" data-view="build" type="button">Open Schedule BUILD</button></div></article>
+<article class="card wide schedule-builder-card subpage-block manager-only" data-subpage="builder">
+<div class="card-head wrap">
+<div><h2>Manager → Fill shifts / offers</h2><p class="muted">Choose a day tab, click a grey needed slot, and assign or offer it without leaving the manager schedule planner. Employees are filtered from Employee Profile BUILD by station qualifications, eligible shift types, can-work rules, and cannot-work rules. Read-only profiles can view the planner; writable schedule access is required to save assignments, offers, notes, and output.</p></div>
+<div class="inline-row"><label class="inline-label">Week of <input id="scheduleWeekStart" type="date"/></label><button class="ghost" id="refreshScheduleBtn">Refresh week</button></div>
+</div>
+<div class="list compact-list" id="scheduleWarnings"></div><div class="scheduler-readonly-note result-box" hidden>Read-only schedule access: you can view the manager schedule board, but only chef/team-leader profiles or employees granted scheduler-write access can assign shifts, offer shifts, write chef notes, or send the schedule.</div>
+<div aria-label="Fine dining kitchen imagery" class="scheduler-photo-strip">
+<div class="photo-card photo-1"><span>Kitchen in motion</span></div>
+<div class="photo-card photo-2"><span>Plating and service</span></div>
+<div class="photo-card photo-3"><span>Costing with precision</span></div>
+</div>
+<div class="schedule-legend"><span><i class="legend-dot needed"></i> Blueprint needed slot</span><span><i class="legend-dot available"></i> Can work</span><span><i class="legend-dot off"></i> Scheduled off / can't work</span><span><i class="legend-dot shift"></i> Assigned shift</span></div>
+<div class="scheduler-filter-bar" id="schedulerFilterBar" aria-label="Schedule filters"><label>DAY<select id="scheduleFilterDay"><option value="">All days</option></select></label><label>WEEK<select id="scheduleFilterWeek"><option value="this">This week</option><option value="next">Next week</option></select></label><label>STATION<select id="scheduleFilterStation"><option value="">All stations</option></select></label><label>EMPLOYEE<select id="scheduleFilterEmployee"><option value="">All employees</option></select></label><button class="ghost" id="clearScheduleFilters" type="button">Clear filters</button></div>
+<div class="weekly-board" id="weeklyScheduleBoard"></div>
+<aside class="shift-side-panel" id="shiftSidePanel" aria-live="polite"><button class="ghost side-close" id="closeShiftSidePanel" type="button">Close</button><div class="empty">Click a colored shift bar to view employee hours, conflicts, notes, and offer-shift actions.</div></aside>
+<div class="slot-controls schedule-write-only" id="schedulerSlotControls">
+<div class="slot-control-head">
+<div><strong>Selected needed shift</strong><span class="muted" id="slotControlHint">Click a grey needed shift above. The box turns white, then use SHIFT, EMPLOYEE, STATION, or OFFER SHIFT here inside the scheduler UI.</span></div>
+<button class="gold-save" id="saveSlotAssignmentBtn" type="button">SAVE SHIFT</button>
+</div>
+<div class="slot-menu-tabs">
+<button class="active" data-slot-menu="shift" type="button">SHIFT</button>
+<button data-slot-menu="employee" type="button">EMPLOYEE</button>
+<button data-slot-menu="station" type="button">STATION</button>
+<button data-slot-menu="offer" type="button">OFFER SHIFT</button>
+</div>
+<div class="selected-slot-summary" id="selectedBlueprintSummary"><span class="muted">No grey slot selected yet.</span></div>
+<div class="slot-menu-body" id="slotMenuBody">
+<div class="slot-panel active" data-slot-panel="shift"><label>Shift from BUILD blueprint <select id="slotShiftSelect"></select></label><p class="muted tiny">Shift, start, and end come from BUILD → Scheduler Blueprint. Selecting a slot above fills this automatically.</p></div>
+<div class="slot-panel" data-slot-panel="employee"><label>Employee from valid profile matches <select id="slotEmployeeSelect"></select></label><div class="list compact-list" id="slotCandidateList"></div><label class="check-row"><input id="slotOverrideConflict" type="checkbox" value="1"/> Chef override if availability / station conflict</label><label>Chef-only shift notes <textarea id="slotChefNotes" placeholder="Private note for this employee/slot, or reason for override"></textarea></label><div class="result-box profile-preview" id="shiftSelectedEmployeeProfile"><span class="muted">Choose an employee from the filtered list. Availability comes from Employee Profile BUILD.</span></div></div>
+<div class="slot-panel" data-slot-panel="station"><label>Station from BUILD blueprint <select id="slotStationSelect"></select></label><p class="muted tiny">Stations come from BUILD → Station Tool. Employee choices narrow by the selected station and the selected shift.</p></div>
+<div class="slot-panel" data-slot-panel="offer"><div class="offer-grid"><label>Offer shift <select id="offerShiftMode"><option value="all">TO ALL THAT APPLY</option><option value="selected">Choose employees below</option></select></label><button class="primary" id="sendOfferShiftBtn" type="button">SEND</button></div><div class="checkbox-grid" id="offerEmployeeChecks"></div><p class="muted tiny">Offered slots show as a split-color box until an employee accepts. The side panel lets the chef add respond-by time, auto-send to eligible employees, or manually choose who receives the offer.</p></div>
+</div>
+</div>
+<div class="schedule-output-bar schedule-write-only">
+<button class="primary" id="postScheduleMenuBtn" type="button">SEND TO EMPLOYEES</button>
+<button class="ghost" id="printWeeklyScheduleBtn" type="button">PRINT</button>
+<button class="ghost" id="downloadScheduleCsvBtn" type="button">SAVE TO DEVICE</button>
+</div>
+</article>
+<article class="card wide employee-only-schedule subpage-block" data-subpage="employee_build">
+<div class="card-head wrap"><div><h2>My SCHEDULE</h2><p class="muted">Employees see the posted schedule, open shift offers, and their own availability records. When the chef posts or changes the schedule, employees receive a notification and can accept offered shifts.</p></div></div>
+<div class="list" id="myScheduleMakerList"></div>
+</article>
+<article class="card wide">
+<div class="card-head wrap"><div><h2>Employee Profile BUILD → Schedule availability</h2><p class="muted">Employees submit the days, shifts, and stations they can work or cannot work as an ongoing profile. The chef scheduler keeps using this saved profile indefinitely until the employee or team leader changes it, so normal availability does not need to be rebuilt every week.</p></div></div>
+<div class="grid two">
+<form class="form-card inner-form weekly-availability-form" id="myCanWorkForm"><h3>I can work these weekly shifts and stations</h3><input name="status" type="hidden" value="can_work"/><div class="form-grid"><label>Day <select name="day_of_week" required=""><option value="0">Monday</option><option value="1">Tuesday</option><option value="2">Wednesday</option><option value="3">Thursday</option><option value="4">Friday</option><option value="5">Saturday</option><option value="6">Sunday</option></select></label><label>Shift <select name="shift_label"><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Prep</option><option>Close</option><option>Any shift</option><option>Custom</option></select></label><label>Start time <input name="start_time" required="" type="time"/></label><label>End time <input name="end_time" required="" type="time"/></label></div><label>Label <input name="label" placeholder="Can work lunch, prefer prep, can close"/></label><button class="primary">Submit weekly can-work shift</button></form>
+<form class="form-card inner-form weekly-availability-form" id="myCannotWorkForm"><h3>I cannot work these weekly shifts</h3><input name="status" type="hidden" value="cannot_work"/><div class="form-grid"><label>Day <select name="day_of_week" required=""><option value="0">Monday</option><option value="1">Tuesday</option><option value="2">Wednesday</option><option value="3">Thursday</option><option value="4">Friday</option><option value="5">Saturday</option><option value="6">Sunday</option></select></label><label>Shift <select name="shift_label"><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Prep</option><option>Close</option><option>Any shift</option><option>Custom</option></select></label><label>Start time <input name="start_time" required="" type="time"/></label><label>End time <input name="end_time" required="" type="time"/></label></div><label>Label / reason <input name="reason" placeholder="School, second job, unavailable, no closes"/></label><button class="primary">Submit weekly cannot-work shift</button></form>
+</div>
+</article>
+<article class="card wide subpage-block manager-only" data-subpage="preplist" id="managerPreplistPanel"><div class="card-head wrap"><div><h2>Manager → PREPLIST rank / assign</h2><p class="muted">Authorized managers rank prep items by need, sort by station/shift/need-by, and assign work to employees scheduled for the shift. Suggested RANK uses open prep urgency, upcoming shifts, and POS-driven demand so tomorrow lunch needs can outrank a dinner-only 86.</p></div><button class="ghost" id="refreshManagerPreplistBtn" type="button">Refresh PREPLIST</button></div><div class="scheduler-filter-bar"><label>SORT BY<select id="managerPreplistSort"><option value="need_by">NEED BY upcoming shifts</option><option value="rank">RANK / priority</option><option value="station">STATION</option></select></label><label>STATION<select id="managerPreplistStationFilter"><option value="">All stations</option></select></label><label>SHIFT<select id="managerPreplistShiftFilter"><option value="">All shifts</option></select></label></div><div class="list" id="managerPreplistItems"></div></article>
+<div class="grid two leader-only">
+<article class="card subpage-block" data-subpage="hours"><div class="card-head"><h2>Hours, overtime, and claims</h2><button class="ghost" id="refreshHoursBtn">Refresh</button></div><div class="list" id="hoursList"></div></article>
+<article class="card"><h2>Team schedule maker database</h2><p class="muted">Chef view of everyone's can-work and can't-work records for the selected week.</p><div class="list" id="availabilityList"></div></article>
+</div>
+<article class="card wide"><h2>Schedule and open shifts</h2><div class="list" id="shiftList"></div></article>
+</section>
+<section class="view" id="team">
+<article class="card wide tool-intro hero-panel team-hero">
+<div>
+<h2>Teams &amp; Notes</h2>
+<p class="muted">Teams &amp; Notes is the restaurant communication and clearance hub. BUILD pages create employees, permissions, stations, shifts, and task eligibility; this area is for using that information every day: granting temporary access, requesting time off, sending notes, reporting incidents, voting, and seeing employee-facing schedule information.</p>
+<p class="muted">Instead of text chains, sticky notes, and word-of-mouth handoffs, Chef Ledger keeps messages tied to the tool they affect: inventory, ordering, scheduling, maintenance, prep, station closeout, votes, or manager-only records.</p>
+</div>
+</article>
+<div class="team-menu-bar" id="teamSubNav">
+<button class="active" data-team-subpage="access" type="button">ACCESS</button>
+<button data-team-subpage="messages" type="button">POSTS / INCIDENTS</button>
+<button data-team-subpage="members" type="button">MEMBERS</button>
+<button data-team-subpage="timeoff" type="button">REQUEST TIME OFF</button>
+<button data-team-subpage="votes" type="button">VOTE</button>
+<button data-team-subpage="notifications" type="button">NOTIFICATIONS</button>
+<button class="leader-only-inline" data-team-subpage="profiles" type="button">EMPLOYEE PROFILE BUILD</button>
+</div>
+<div class="team-panel active" data-team-panel="access">
+<article class="card wide">
+<h2>ACCESS</h2>
+<p class="muted">Use ACCESS when a person needs temporary clearance for a specific tool, not a permanent role change. A chef, sous, manager, or team leader can grant access for one shift, one day, one week, or indefinitely. This is useful when someone calls off, a vacation creates a coverage gap, or an emergency requires a trusted employee to complete a task they normally cannot access.</p>
+<p class="muted">Temporary access is narrower than a role. Giving an employee access to Manual Inventory or Ordering does not make them a manager; it only unlocks that page or workflow for the selected duration. Active grants show in the employee portal and are used by Chef Ledger when deciding which menu items and pages are visible.</p>
+</article>
+<div class="grid two">
+<form class="card form-card leader-only" id="inviteForm">
+<h2>One-time employee passcode</h2>
+<p class="muted">Create a code to join the restaurant account. Use this for onboarding a new employee into basic, station, team-leader, manager, or chef-level access.</p>
+<div class="form-grid">
+<label>Role <select name="role"><option value="employee">Employee</option><option value="team_leader">Team leader</option><option value="manager">Manager</option><option value="chef">Chef</option></select></label>
+<label>Station <input name="station" placeholder="Grill"/></label>
+<label>Expires in days <input name="days" type="number" value="7"/></label>
+</div>
+<button class="primary">Generate passcode</button>
+<div class="result-box" id="newInviteCode"></div>
+</form>
+<form class="card form-card leader-only" id="accessGrantForm">
+<h2>Temporary access grant</h2>
+<p class="muted">Pick the employee, the exact tool/page, and the duration. The grant is logged, visible to managers, and ends automatically unless set to indefinitely.</p>
+<div class="form-grid">
+<label>Employee <select id="accessGrantUserSelect" name="user_id" required=""></select></label>
+<label>Tool / page <select name="tool"><option value="employee_basic">Employee basic</option><option value="station">Station / covering shifts</option><option value="inventory">Inventory</option><option value="manual_inventory">Manual Inventory</option><option value="ordering">Ordering</option><option value="prep">Prep</option><option value="scheduler_read">Scheduler read-only</option><option value="scheduler_write">Scheduler write / fill shifts</option><option value="maintenance">Maintenance</option><option value="votes">Vote captain/helper</option><option value="manager_notes">Manager notes</option></select></label>
+<label>Duration <select name="duration"><option value="shift">Shift</option><option value="day">Day</option><option value="week">Week</option><option value="indefinitely">Indefinitely</option><option value="custom">Custom date/time</option></select></label>
+<label>Custom expires at <input name="expires_at" type="datetime-local"/></label>
+</div>
+<label>Reason <input name="reason" placeholder="Covering manual inventory while sous is sick"/></label>
+<button class="primary">Grant temporary access</button>
+</form>
+</div>
+<article class="card wide leader-only"><h2>Active temporary access</h2><p class="muted">These clearances are checked by the site before showing tools. Use this list to see who has access, why, and when it expires.</p><div class="list compact-list" id="accessGrantList"></div></article>
+</div>
+<div class="team-panel" data-team-panel="messages">
+<article class="card wide">
+<h2>POST NOTE / SUGGESTIONS / REPORT INCIDENT</h2>
+<p class="muted">This page replaces loose texts and verbal reminders with a structured post tied to the tool it affects. A spilled #10 can of beans can go to Ordering / Manual Inventory eligible people; a broken fryer can go to Maintenance; a schedule question can go to Scheduling. The chef controls whether employees can message each other, whether all posts copy managers, and which task groups receive which messages.</p>
+</article>
+<div class="grid two"><article class="card leader-only"><h2>Message Builder moved to BUILD</h2><p class="muted">Message eligibility is employee setup. Open BUILD → Employee → Message Builder to assign which employees receive ordering, maintenance, prep, scheduling, station, manual inventory, and vote messages.</p><button class="primary" data-focus="buildEmployeeMessageBuilderPage" data-view="build" type="button">Open BUILD Message Builder</button></article>
+<form class="card form-card" id="postForm">
+<h2>Post note, request, incident, or suggestion</h2>
+<p class="muted">Choose the type and category. Chef Ledger notifies managers and the employees eligible for that category.</p>
+<div class="form-grid">
+<label>Type <select name="type"><option value="note">Note</option><option value="suggestion">Suggestion</option><option value="request">Request</option><option value="incident">Incident</option><option value="manager_note">Manager note</option></select></label>
+<label>Category <select name="category"><option value="generic">Generic</option><option value="ordering">Ordering</option><option value="manual_inventory">Manual inventory</option><option value="scheduler">Scheduling</option><option value="prep">Prep</option><option value="station">Station</option><option value="maintenance">Maintenance</option><option value="vote">Vote</option></select></label>
+<label>Visibility <select name="visibility"><option value="team">Team / eligible employees</option><option value="leaders">Team leaders + managers</option><option value="managers">Managers only</option></select></label>
+<label>Specific recipient optional <select id="postTargetUserSelect" name="target_user_id"><option value="">Use category eligibility</option></select></label>
+</div>
+<label>Title <input name="title" placeholder="10# can of beans spilled" required=""/></label>
+<label>Body <textarea name="body" placeholder="Write what happened, what is needed, and which shift/station it affects." required=""></textarea></label>
+<button class="primary">Post</button>
+</form>
+</div>
+<article class="card wide"><h2>Team posts, incidents, and manager notes</h2><div class="list" id="postsList"></div></article>
+</div>
+<div class="team-panel" data-team-panel="members">
+<article class="card wide">
+<h2>MEMBERS</h2>
+<p class="muted">Member pages show the employee profile in one place: current and next week schedule, stations they can work, open/offered shifts, time-off balance, notification history, and a message box. Employees only see their own offers; leaders can view the whole team.</p>
+</article>
+<div class="grid two">
+<article class="card leader-only"><h2>All team members</h2><div class="list" id="teamUsers"></div></article>
+<article class="card"><h2>My / selected member home</h2><label>Member <select id="memberHomeUserSelect"></select></label><div class="list" id="memberHomePanel"></div><form class="form-card inner-form" id="memberMessageForm"><h3>Leave a message</h3><input name="type" type="hidden" value="note"/><input name="visibility" type="hidden" value="team"/><input name="category" type="hidden" value="generic"/><input id="memberMessageTargetUserId" name="target_user_id" type="hidden"/><label>Title <input name="title" placeholder="Question for this team member" required=""/></label><label>Message <textarea name="body" required=""></textarea></label><button class="primary">Send member message</button></form></article>
+</div>
+</div>
+<div class="team-panel" data-team-panel="timeoff">
+<article class="card wide"><h2>REQUEST TIME OFF</h2><p class="muted">Employees request time off from here. Team leaders set each employee's allowed days, remaining days, reset date, and rollover rule. Approved time off automatically subtracts days and creates a scheduler unavailable block.</p></article>
+<div class="grid two"><article class="card leader-only"><h2>Days-Off Profile moved to BUILD</h2><p class="muted">Days-off banks are employee setup. Open BUILD → Employee → Days-Off Profile to set allowed days, remaining balance, reset date, and rollover before approving requests.</p><button class="primary" data-focus="buildEmployeeDaysOffPage" data-view="build" type="button">Open BUILD Days-Off Profile</button></article>
+<form class="card form-card" id="timeOffRequestForm">
+<h3>Request / calculate time off</h3>
+<label>Employee <select id="timeOffRequestUserSelect" name="user_id" required=""></select></label>
+<div class="form-grid"><label>First day off <input name="start_date" required="" type="date"/></label><label>Last day off <input name="end_date" required="" type="date"/></label></div>
+<label>Reason <textarea name="reason" placeholder="Vacation, sick, appointment, family event"></textarea></label>
+<div class="result-box" id="timeOffCalcResult"></div>
+<div class="row"><button class="ghost" id="calculateTimeOffBtn" type="button">Calculate days</button><button class="primary">Submit request</button></div>
+</form>
+</div>
+<div class="list" id="timeOffList"></div>
+</div>
+<div class="team-panel" data-team-panel="votes">
+<article class="card wide"><h2>VOTE</h2><p class="muted">Eligible employees can propose topics, but a designated vote captain approves what actually appears on the vote page. This keeps serious kitchen decisions organized without turning the app into a noisy group chat.</p></article>
+<div class="grid two">
+<form class="card form-card" id="voteTopicForm">
+<h2>VOTE TOPIC BUILDER</h2>
+<label>Title <input name="title" placeholder="Family meal options for next month" required=""/></label>
+<label>Selections <textarea name="options" placeholder="One selection per line: Pasta
+Tacos
+Rice bowls" required=""></textarea></label>
+<label>Who can vote? <select name="target_group"><option value="all">All employees</option><option value="leaders">Team leaders + managers</option><option value="ordering">Ordering eligible</option><option value="station">Station eligible</option><option value="custom">Custom / captain decides</option></select></label>
+<button class="primary">Send to be approved</button>
+</form>
+<article class="card leader-only"><h2>Vote captain review</h2><p class="muted">Captains can edit/approve/deny pending topics. Use Edit note to send refinements back to the person who submitted it.</p><div class="list" id="voteCaptainList"></div></article>
+</div>
+<article class="card wide"><h2>Approved vote topics</h2><div class="list" id="approvedVoteList"></div></article>
+</div>
+<div class="team-panel" data-team-panel="notifications">
+<article class="card wide"><h2>NOTIFICATIONS</h2><p class="muted">Notifications show schedule posts, shift offers, access grants, time-off decisions, inventory messages, incident alerts, and vote decisions with timestamps.</p></article>
+<article class="card"><div class="card-head"><h2>Notifications</h2><button class="ghost" id="markReadBtn">Mark read</button></div><div class="list" id="notificationsList"></div></article>
+</div>
+<div class="team-panel" data-team-panel="profiles">
+<article class="card wide leader-only"><h2>EMPLOYEE PROFILE BUILD</h2><p class="muted">This is the BUILD side for employee scheduling. Set station qualifications, eligible shifts, unique color, can-work rules, can't-work rules, and the recurring weekly profile used by the Scheduler Builder.</p></article>
+<article class="card wide leader-only"><h2>Employee Scheduling Profile moved to BUILD</h2><p class="muted">Station qualifications, eligible shifts, assigned color, can-work rules, and can't-work rules are now maintained under BUILD → Employee → Scheduling Profile.</p><button class="primary" data-focus="buildEmployeeScheduleProfilePage" data-view="build" type="button">Open BUILD Scheduling Profile</button></article></div>
+</section>
+</section></main>
+<script src="/app.js?v=58"></script>
+</body>
+</html>

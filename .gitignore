@@ -1,0 +1,32 @@
+# Path: chef-ledger-operational/.gitignore
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+.venv/
+venv/
+ENV/
+env/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local runtime logs / temp
+*.log
+*.tmp
+*.bak
+
+# Local secrets
+.env
+.env.*
+*.secret
+secrets/
+
+# IMPORTANT:
+# The demo SQLite database and demo CSV files are intentionally included in this prototype repo package.
+# For a real customer production app, remove customer DBs/uploads from git and use managed DB/object storage.
