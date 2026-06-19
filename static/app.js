@@ -1,6 +1,6 @@
 /*
 Path: chef-ledger-operational/static/app.js
-Chef Ledger operational MVP frontend — Subscription Landing v61
+Chef Ledger operational MVP frontend — Render + Stripe Subscription v63
 */
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
@@ -428,12 +428,35 @@ function tierStorageLabel(tier) {
   if (mb >= 1024) return `${(mb / 1024).toLocaleString(undefined, { maximumFractionDigits: 1 })} GB FILES cap`;
   return `${mb.toLocaleString(undefined, { maximumFractionDigits: 0 })} MB FILES cap`;
 }
+function stripeClientReference(tierKey) {
+  const teamId = state.user?.team_id || state.team?.id || '';
+  const userId = state.user?.id || '';
+  return `chefledger|team=${teamId}|user=${userId}|tier=${tierKey}`;
+}
+
+function stripeBuyButtonHtml(tier) {
+  const buttonId = tier?.stripe_buy_button_id || '';
+  const publishableKey = tier?.stripe_publishable_key || '';
+  if (!buttonId || !publishableKey || !state.user?.id) return '';
+  return `<div class="stripe-buy-button-wrap" data-stripe-tier="${escapeHtml(tier.key)}">
+    <stripe-buy-button
+      buy-button-id="${escapeHtml(buttonId)}"
+      publishable-key="${escapeHtml(publishableKey)}"
+      client-reference-id="${escapeHtml(stripeClientReference(tier.key))}">
+    </stripe-buy-button>
+  </div>`;
+}
+
 
 function tierCardHtml(tier, context = 'landing') {
   if (!tier) return '';
   const active = state.selectedSubscriptionTier === tier.key ? ' selected' : '';
   const features = (tier.features || []).slice(0, 5).map(f => `<li>${escapeHtml(f)}</li>`).join('');
-  const buttonText = context === 'lock' ? 'Choose this tier' : 'Select tier';
+  const buttonText = context === 'lock' ? 'Prepare this tier' : 'Select tier';
+  const buyButton = context === 'lock' ? stripeBuyButtonHtml(tier) : '';
+  const checkoutNote = context === 'lock'
+    ? `<p class="muted tiny-note">After clicking the Stripe button and completing checkout, return here and use Refresh Status. Stripe webhooks unlock the account automatically.</p>`
+    : '';
   return `<article class="tier-card${active}" data-tier-card="${escapeHtml(tier.key)}">
     <div class="tier-card-top">
       <div><h3>${escapeHtml(tier.name)}</h3><p class="muted small-note">${escapeHtml(tier.tagline || '')}</p></div>
@@ -442,6 +465,8 @@ function tierCardHtml(tier, context = 'landing') {
     <p class="tier-best">${escapeHtml(tier.best_for || '')}</p>
     <ul>${features}</ul>
     <div class="tier-card-foot"><span>${escapeHtml(tierStorageLabel(tier))}</span><button class="${context === 'lock' ? 'primary' : 'ghost'}" data-select-subscription-tier="${escapeHtml(tier.key)}" data-context="${escapeHtml(context)}" type="button">${buttonText}</button></div>
+    ${buyButton}
+    ${checkoutNote}
   </article>`;
 }
 

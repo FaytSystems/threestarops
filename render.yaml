@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: threestarops
+    runtime: python
+    plan: free
+    buildCommand: python -m pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: python server.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: CHEF_LEDGER_ALLOW_LOCAL_SUBSCRIPTION_ACTIVATE
+        value: "false"
+      - key: CHEF_LEDGER_STRIPE_PUBLISHABLE_KEY
+        value: pk_live_51TdF41GJtywdCBcEVXcvUM8SB5O6Y34OCA0nrPqvlfa5RQfmSj5TroPhVQq8heMzbJZuEhxoOwVXC7sYrpSBybdk002vxsC9AC
+      - key: CHEF_LEDGER_STRIPE_BUY_BUTTON_STARTER
+        value: buy_btn_1ThUNgGJtywdCBcETVYJjTha
+      - key: CHEF_LEDGER_STRIPE_BUY_BUTTON_KITCHEN
+        value: buy_btn_1ThUPGGJtywdCBcET4iAdZqh
+      - key: CHEF_LEDGER_STRIPE_BUY_BUTTON_CHEF
+        value: buy_btn_1ThUPTGJtywdCBcEBqr6zQiM
+      - key: CHEF_LEDGER_STRIPE_BUY_BUTTON_AUTHORITY
+        value: buy_btn_1ThUOcGJtywdCBcEpfMequal
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Chef Ledger Operational MVP — Subscription Landing v61
+Chef Ledger Operational MVP — Render + Stripe Subscription v63
 Path: chef-ledger-operational/server.py
 
-A dependency-free local SaaS-style backend for Chef Ledger.
-Run: python server.py
-Then open: http://127.0.0.1:8787
+A dependency-free SaaS-style backend for ThreeStarOps / Chef Ledger.
+Local run: python server.py
+Render run: PORT is detected automatically and the server binds to 0.0.0.0.
 """
 from __future__ import annotations
 
@@ -36,8 +36,8 @@ STATIC_ROOT = APP_ROOT / "static"
 DATA_ROOT = APP_ROOT / "data"
 UPLOAD_ROOT = DATA_ROOT / "uploads"
 DB_PATH = DATA_ROOT / "chef_ledger.sqlite3"
-HOST = os.environ.get("CHEF_LEDGER_HOST", "127.0.0.1")
-PORT = int(os.environ.get("CHEF_LEDGER_PORT", "8787"))
+PORT = int(os.environ.get("CHEF_LEDGER_PORT") or os.environ.get("PORT") or "8787")
+HOST = os.environ.get("CHEF_LEDGER_HOST") or ("0.0.0.0" if os.environ.get("PORT") else "127.0.0.1")
 SESSION_DAYS = 14
 
 ROLE_ORDER = {
@@ -978,6 +978,9 @@ def migrate() -> None:
             "ALTER TABLE teams ADD COLUMN subscription_checkout_url TEXT DEFAULT ''",
             "ALTER TABLE teams ADD COLUMN subscription_started_at TEXT DEFAULT ''",
             "ALTER TABLE teams ADD COLUMN subscription_updated_at TEXT DEFAULT ''",
+            "ALTER TABLE teams ADD COLUMN stripe_customer_id TEXT DEFAULT ''",
+            "ALTER TABLE teams ADD COLUMN stripe_subscription_id TEXT DEFAULT ''",
+            "ALTER TABLE teams ADD COLUMN stripe_last_event_id TEXT DEFAULT ''",
             "ALTER TABLE pos_csv_rows ADD COLUMN matched_dish_id INTEGER",
             "ALTER TABLE pos_csv_files ADD COLUMN storage_path TEXT DEFAULT ''",
             "ALTER TABLE pos_csv_files ADD COLUMN size_bytes INTEGER NOT NULL DEFAULT 0",
@@ -1172,6 +1175,18 @@ SUBSCRIPTION_TIERS = {
     },
 }
 
+STRIPE_PUBLISHABLE_KEY = os.environ.get(
+    "CHEF_LEDGER_STRIPE_PUBLISHABLE_KEY",
+    "pk_live_51TdF41GJtywdCBcEVXcvUM8SB5O6Y34OCA0nrPqvlfa5RQfmSj5TroPhVQq8heMzbJZuEhxoOwVXC7sYrpSBybdk002vxsC9AC",
+).strip()
+
+STRIPE_BUY_BUTTON_IDS = {
+    "starter": os.environ.get("CHEF_LEDGER_STRIPE_BUY_BUTTON_STARTER", "buy_btn_1ThUNgGJtywdCBcETVYJjTha").strip(),
+    "plus": os.environ.get("CHEF_LEDGER_STRIPE_BUY_BUTTON_KITCHEN", "buy_btn_1ThUPGGJtywdCBcET4iAdZqh").strip(),
+    "pro": os.environ.get("CHEF_LEDGER_STRIPE_BUY_BUTTON_CHEF", "buy_btn_1ThUPTGJtywdCBcEBqr6zQiM").strip(),
+    "top": os.environ.get("CHEF_LEDGER_STRIPE_BUY_BUTTON_AUTHORITY", "buy_btn_1ThUOcGJtywdCBcEpfMequal").strip(),
+}
+
 ACTIVE_SUBSCRIPTION_STATUSES = {"active", "trialing", "demo", "comped"}
 
 
@@ -1190,6 +1205,8 @@ def subscription_tier_catalog() -> list[dict]:
     for key in ("starter", "plus", "pro", "top"):
         item = dict(SUBSCRIPTION_TIERS[key])
         item["checkout_url"] = checkout_url_for_tier(key)
+        item["stripe_buy_button_id"] = STRIPE_BUY_BUTTON_IDS.get(key, "")
+        item["stripe_publishable_key"] = STRIPE_PUBLISHABLE_KEY
         item["limits"] = dict(TIER_LIMITS[key])
         item.pop("stripe_env", None)
         catalog.append(item)
@@ -1201,6 +1218,16 @@ def normalize_subscription_tier(value: str | None) -> str:
     aliases = {"basic": "starter", "kitchen": "plus", "chef": "pro", "authority": "top", "premium": "top"}
     tier = aliases.get(tier, tier)
     return tier if tier in SUBSCRIPTION_TIERS else "starter"
+
+
+def local_subscription_activation_allowed() -> bool:
+    configured = os.environ.get("CHEF_LEDGER_ALLOW_LOCAL_SUBSCRIPTION_ACTIVATE")
+    if configured is not None:
+        return configured.lower() not in ("0", "false", "no")
+    # Render/production deployments should unlock through Stripe webhooks, not local bypass buttons.
+    if os.environ.get("RENDER") or os.environ.get("PORT"):
+        return False
+    return True
 
 
 def subscription_for_team(conn: sqlite3.Connection, team_id: int) -> dict:
@@ -1220,7 +1247,7 @@ def subscription_for_team(conn: sqlite3.Connection, team_id: int) -> dict:
         "updated_at": team["subscription_updated_at"] if team and "subscription_updated_at" in team.keys() else "",
         "catalog_item": item,
         "limits": tier_limits(conn, team_id),
-        "local_preview_activation_available": os.environ.get("CHEF_LEDGER_ALLOW_LOCAL_SUBSCRIPTION_ACTIVATE", "yes").lower() not in ("0", "false", "no"),
+        "local_preview_activation_available": local_subscription_activation_allowed(),
     }
 
 
@@ -3933,6 +3960,8 @@ class ChefLedgerHandler(SimpleHTTPRequestHandler):
             return self.send_json({"error": "Not found"}, 404)
 
     def api_post(self, path: str, qs: dict) -> None:
+        if path == "/api/stripe/webhook":
+            return self.handle_stripe_webhook()
         data = self.read_json()
         with db() as conn:
             if path == "/api/auth/register":
@@ -4016,7 +4045,7 @@ class ChefLedgerHandler(SimpleHTTPRequestHandler):
             if path == "/api/subscription/activate_local":
                 if not self.require_role(user, "owner"):
                     return
-                if os.environ.get("CHEF_LEDGER_ALLOW_LOCAL_SUBSCRIPTION_ACTIVATE", "yes").lower() in ("0", "false", "no"):
+                if not local_subscription_activation_allowed():
                     return self.send_json({"error": "Local subscription activation is disabled. Use Stripe checkout/webhooks in production."}, 403)
                 tier = normalize_subscription_tier(data.get("tier") or team_tier(conn, team_id))
                 price = SUBSCRIPTION_TIERS[tier]["price"]
@@ -5360,6 +5389,153 @@ class ChefLedgerHandler(SimpleHTTPRequestHandler):
                 conn.commit()
                 return self.send_json({"ok": True})
             return self.send_json({"error": "Not found"}, 404)
+
+    def read_raw_body(self) -> bytes:
+        length = int(self.headers.get("Content-Length", "0") or 0)
+        if length <= 0:
+            return b""
+        return self.rfile.read(length)
+
+    def verify_stripe_signature(self, raw_body: bytes) -> bool:
+        secret = os.environ.get("STRIPE_WEBHOOK_SECRET", "").strip()
+        if not secret:
+            # Allow unverified local/test handling if no webhook secret is configured.
+            # Production should set STRIPE_WEBHOOK_SECRET from Stripe Dashboard.
+            return True
+        sig_header = self.headers.get("Stripe-Signature", "")
+        parts: dict[str, list[str]] = {}
+        for bit in sig_header.split(","):
+            if "=" in bit:
+                k, v = bit.split("=", 1)
+                parts.setdefault(k.strip(), []).append(v.strip())
+        timestamp = (parts.get("t") or [""])[0]
+        signatures = parts.get("v1") or []
+        if not timestamp or not signatures:
+            return False
+        signed_payload = timestamp.encode("utf-8") + b"." + raw_body
+        expected = hmac.new(secret.encode("utf-8"), signed_payload, hashlib.sha256).hexdigest()
+        return any(hmac.compare_digest(expected, item) for item in signatures)
+
+    def parse_stripe_client_reference(self, value: str | None) -> dict:
+        ref = (value or "").strip()
+        out = {"team_id": 0, "user_id": 0, "tier": ""}
+        if not ref:
+            return out
+        # Current frontend format: chefledger|team=1|user=2|tier=starter
+        for part in ref.split("|"):
+            if "=" not in part:
+                continue
+            k, v = part.split("=", 1)
+            k = k.strip().lower()
+            v = v.strip()
+            try:
+                if k == "team":
+                    out["team_id"] = int(v or 0)
+                elif k == "user":
+                    out["user_id"] = int(v or 0)
+                elif k == "tier":
+                    out["tier"] = normalize_subscription_tier(v)
+            except ValueError:
+                continue
+        return out
+
+    def activate_team_subscription_from_stripe(self, conn: sqlite3.Connection, *, team_id: int = 0, user_id: int = 0, tier: str = "", status: str = "active", stripe_customer_id: str = "", stripe_subscription_id: str = "", event_id: str = "") -> dict:
+        tier = normalize_subscription_tier(tier or "starter")
+        if not team_id and user_id:
+            row = one(conn, "SELECT team_id FROM users WHERE id=?", (user_id,))
+            team_id = int(row["team_id"] or 0) if row else 0
+        if not team_id and stripe_subscription_id:
+            row = one(conn, "SELECT id FROM teams WHERE stripe_subscription_id=?", (stripe_subscription_id,))
+            team_id = int(row["id"] or 0) if row else 0
+        if not team_id and stripe_customer_id:
+            row = one(conn, "SELECT id FROM teams WHERE stripe_customer_id=?", (stripe_customer_id,))
+            team_id = int(row["id"] or 0) if row else 0
+        if not team_id:
+            return {"ok": False, "error": "No matching ThreeStarOps team for Stripe event"}
+        price = SUBSCRIPTION_TIERS[tier]["price"]
+        now = now_iso()
+        conn.execute(
+            """
+            UPDATE teams
+            SET subscription_tier=?, subscription_status=?, subscription_price_monthly=?,
+                subscription_started_at=COALESCE(NULLIF(subscription_started_at, ''), ?),
+                subscription_updated_at=?, stripe_customer_id=COALESCE(NULLIF(?, ''), stripe_customer_id),
+                stripe_subscription_id=COALESCE(NULLIF(?, ''), stripe_subscription_id),
+                stripe_last_event_id=COALESCE(NULLIF(?, ''), stripe_last_event_id)
+            WHERE id=?
+            """,
+            (tier, status, price, now, now, stripe_customer_id, stripe_subscription_id, event_id, team_id),
+        )
+        create_notification(conn, team_id, "Subscription activated", f"{SUBSCRIPTION_TIERS[tier]['name']} tier is now {status}. Your tools are unlocked according to this plan.", user_id or None)
+        return {"ok": True, "team_id": team_id, "tier": tier, "status": status}
+
+    def handle_stripe_webhook(self) -> None:
+        raw = self.read_raw_body()
+        if not self.verify_stripe_signature(raw):
+            return self.send_json({"error": "Invalid Stripe signature"}, 400)
+        try:
+            event = json.loads(raw.decode("utf-8") or "{}")
+        except json.JSONDecodeError:
+            return self.send_json({"error": "Invalid Stripe webhook JSON"}, 400)
+        event_type = event.get("type", "")
+        event_id = event.get("id", "")
+        obj = (event.get("data") or {}).get("object") or {}
+        with db() as conn:
+            # Idempotency: ignore exact same Stripe event if already recorded.
+            if event_id:
+                seen = one(conn, "SELECT id FROM teams WHERE stripe_last_event_id=?", (event_id,))
+                if seen:
+                    return self.send_json({"received": True, "duplicate": True})
+            result = {"ok": True, "ignored": event_type}
+            if event_type == "checkout.session.completed":
+                ref = self.parse_stripe_client_reference(obj.get("client_reference_id"))
+                status = "active" if obj.get("payment_status") in ("paid", "no_payment_required") or obj.get("status") == "complete" else "pending_checkout"
+                result = self.activate_team_subscription_from_stripe(
+                    conn,
+                    team_id=ref.get("team_id", 0),
+                    user_id=ref.get("user_id", 0),
+                    tier=ref.get("tier") or "starter",
+                    status=status,
+                    stripe_customer_id=str(obj.get("customer") or ""),
+                    stripe_subscription_id=str(obj.get("subscription") or ""),
+                    event_id=event_id,
+                )
+            elif event_type in ("customer.subscription.created", "customer.subscription.updated"):
+                sub_status = str(obj.get("status") or "active").lower()
+                app_status = "active" if sub_status in ("active", "trialing") else sub_status
+                result = self.activate_team_subscription_from_stripe(
+                    conn,
+                    status=app_status,
+                    stripe_customer_id=str(obj.get("customer") or ""),
+                    stripe_subscription_id=str(obj.get("id") or ""),
+                    event_id=event_id,
+                )
+            elif event_type == "customer.subscription.deleted":
+                result = self.activate_team_subscription_from_stripe(
+                    conn,
+                    status="canceled",
+                    stripe_customer_id=str(obj.get("customer") or ""),
+                    stripe_subscription_id=str(obj.get("id") or ""),
+                    event_id=event_id,
+                )
+            elif event_type == "invoice.payment_failed":
+                result = self.activate_team_subscription_from_stripe(
+                    conn,
+                    status="past_due",
+                    stripe_customer_id=str(obj.get("customer") or ""),
+                    stripe_subscription_id=str(obj.get("subscription") or ""),
+                    event_id=event_id,
+                )
+            elif event_type == "invoice.payment_succeeded":
+                result = self.activate_team_subscription_from_stripe(
+                    conn,
+                    status="active",
+                    stripe_customer_id=str(obj.get("customer") or ""),
+                    stripe_subscription_id=str(obj.get("subscription") or ""),
+                    event_id=event_id,
+                )
+            conn.commit()
+        return self.send_json({"received": True, "event_type": event_type, "result": result})
 
     def create_session_response(self, conn: sqlite3.Connection, user_id: int) -> None:
         token = secrets.token_urlsafe(32)

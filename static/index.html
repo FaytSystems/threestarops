@@ -4,11 +4,12 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>Chef Ledger — Back-of-House Operations</title>
+<title>ThreeStarOps — Back-of-House Operations</title>
 <meta http-equiv="Cache-Control" content="no-store"/>
-<link href="/styles.css?v=61" rel="stylesheet"/>
+<link href="/styles.css?v=63" rel="stylesheet"/>
 <link href="/manifest.webmanifest" rel="manifest"/>
 <meta content="#111614" name="theme-color"/>
+<script async src="https://js.stripe.com/v3/buy-button.js"></script>
 </head>
 <body>
 <div class="toast" hidden="" id="toast"></div>
@@ -28,7 +29,7 @@
 <main class="auth-shell" id="authScreen">
 <section class="auth-card brand-panel">
 <div class="mark">CL</div>
-<p class="eyebrow">chef-ledger.com restaurant operating system</p>
+<p class="eyebrow">ThreeStarOps restaurant operating system</p>
 <h1>Drop the clipboard. Let the kitchen ledger do the arithmetic.</h1>
 <p class="muted">Chef Ledger turns the work restaurants already do — counts, prep lists, station restocks, vendor orders, recipe cards, POS history, and employee submissions — into one clean, auditable workflow.</p>
 <p class="muted">After the initial setup, the hours saved can pay for the subscription. Plug in the numbers, let the builder fill the site, and keep working while the app turns daily kitchen activity into order sheets, prep sheets, inventory history, and accountability.</p>
@@ -91,7 +92,7 @@
 </main>
 <main class="auth-shell subscription-lock-shell" hidden="" id="subscriptionLockScreen">
 <section class="auth-card brand-panel">
-<div class="mark">CL</div>
+<div class="mark">3★</div>
 <p class="eyebrow">subscription required</p>
 <h1>Choose a tier to unlock the kitchen.</h1>
 <p class="muted">Your profile is created. Select a monthly plan, complete checkout, then Chef Ledger opens the tools your tier includes. Until then, the account workspace stays protected.</p>
@@ -101,7 +102,7 @@
 <span>Order sheets without retyping</span>
 <span>Auditable kitchen work</span>
 </div>
-<button class="ghost" id="subscriptionLogoutBtn" type="button">Logout</button>
+<div class="row wrap"><button class="ghost" id="refreshSubscriptionStatusBtn" type="button">Refresh Status</button><button class="ghost" id="subscriptionLogoutBtn" type="button">Logout</button></div>
 </section>
 <section class="auth-card subscription-lock-card">
 <p class="eyebrow">finish setup</p>

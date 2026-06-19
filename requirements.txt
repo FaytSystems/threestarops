@@ -1,0 +1,2 @@
+# ThreeStarOps / Chef Ledger currently uses only the Python standard library.
+# This file exists so Render's default `pip install -r requirements.txt` build command succeeds.

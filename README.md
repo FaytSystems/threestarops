@@ -1,98 +1,43 @@
-# ThreeStarOps GitHub Upload Package
+# ThreeStarOps Render + Stripe App Package v63
 
 Path: `chef-ledger-operational/README.md`
 
-This package connects the current Chef Ledger / ThreeStarOps operational app to a GitHub repository for the domain:
+This package updates the Chef Ledger / ThreeStarOps app so the hosted site can run as a real Python backend on Render and use live Stripe Buy Buttons for email signup + tier purchase.
+
+## What changed in v63
+
+- `server.py` now detects Render's `$PORT` automatically and binds to `0.0.0.0` on hosted deployments.
+- Added `requirements.txt` so Render's `pip install -r requirements.txt` build command succeeds.
+- Added `render.yaml` and `Procfile` for hosted deployment.
+- Added `/api/stripe/webhook` to activate accounts after Stripe checkout.
+- Added Stripe signature verification using `STRIPE_WEBHOOK_SECRET` when configured.
+- Added Stripe Buy Button IDs to `/api/subscription/tiers`.
+- The lock screen now renders live Stripe Buy Buttons after profile creation.
+- Each Stripe button receives a `client-reference-id` containing the ThreeStarOps team, user, and tier.
+- Local preview activation is disabled automatically on Render/production unless explicitly enabled.
+
+## Render build settings
+
+Recommended settings:
 
 ```text
-threestarops.com
+Runtime: Python
+Build Command: python -m pip install --upgrade pip && pip install -r requirements.txt
+Start Command: python server.py
+Root Directory: leave blank
 ```
 
-## Important hosting note
-
-This app is a Python backend app (`server.py`). GitHub is the right place to store the code, version updates, and connect deployment automation.
-
-GitHub Pages is only suitable for a static landing/marketing page. It will not run this Python backend by itself. For the live app, deploy the repo to a VPS or app host, then point `threestarops.com` to that host.
-
-## Fast GitHub upload flow
-
-1. Create a new empty GitHub repository named:
+Environment variables:
 
 ```text
-threestarops
+PYTHON_VERSION=3.11.9
+CHEF_LEDGER_ALLOW_LOCAL_SUBSCRIPTION_ACTIVATE=false
+STRIPE_WEBHOOK_SECRET=whsec_...
 ```
 
-Do not initialize it with a README if you want the first push to be clean.
+The Stripe publishable key and Buy Button IDs are already baked in as safe frontend defaults, but they can be overridden with environment variables.
 
-2. Extract this ZIP using your normal pattern:
-
-```powershell
-cd "C:\Users\ursamajor\Downloads"
-
-Get-Process python -ErrorAction SilentlyContinue | Stop-Process -Force
-
-Unblock-File ".\chef-ledger-operational-threestarops-github-v62.zip"
-
-Remove-Item ".\chef-ledger-operational" -Recurse -Force -ErrorAction SilentlyContinue
-
-Expand-Archive -Path ".\chef-ledger-operational-threestarops-github-v62.zip" -DestinationPath "." -Force
-
-cd ".\chef-ledger-operational"
-```
-
-3. Push to GitHub:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File ".\connect-threestarops-github.ps1" -RemoteUrl "https://github.com/YOUR_GITHUB_USERNAME/threestarops.git"
-```
-
-Replace `YOUR_GITHUB_USERNAME` with your actual GitHub username or organization.
-
-## Run locally after extracting
-
-```powershell
-cd "C:\Users\ursamajor\Downloads\chef-ledger-operational"
-powershell -ExecutionPolicy Bypass -File ".\run.ps1"
-```
-
-Open:
-
-```text
-http://127.0.0.1:8787
-```
-
-## Run on a Windows VPS / server
-
-```powershell
-cd "C:\Path\To\chef-ledger-operational"
-powershell -ExecutionPolicy Bypass -File ".\run-threestarops-server.ps1"
-```
-
-That script sets:
-
-```text
-CHEF_LEDGER_HOST=0.0.0.0
-CHEF_LEDGER_PORT=8787
-```
-
-For a production public website, place Nginx/Caddy/IIS or another reverse proxy in front of the Python app and serve HTTPS on `threestarops.com`.
-
-## Domain setup summary
-
-For a real hosted backend:
-
-```text
-threestarops.com  -> A record -> your VPS/app host IP
-www               -> CNAME    -> threestarops.com
-```
-
-For a static GitHub Pages marketing page only, GitHub can use the included `CNAME` file containing:
-
-```text
-threestarops.com
-```
-
-## Included Stripe Buy Button mapping
+## Stripe Buy Button mapping
 
 ```text
 Starter / $10    = buy_btn_1ThUNgGJtywdCBcETVYJjTha
@@ -101,22 +46,77 @@ Chef / $19       = buy_btn_1ThUPTGJtywdCBcEBqr6zQiM
 Authority / $25  = buy_btn_1ThUOcGJtywdCBcEpfMequal
 ```
 
-Frontend publishable key currently used for Stripe Buy Buttons:
+Publishable key:
 
 ```text
 pk_live_51TdF41GJtywdCBcEVXcvUM8SB5O6Y34OCA0nrPqvlfa5RQfmSj5TroPhVQq8heMzbJZuEhxoOwVXC7sYrpSBybdk002vxsC9AC
 ```
 
-Do not put any Stripe secret key beginning with `sk_live_` into GitHub.
+Do not commit any Stripe key beginning with `sk_live_`.
 
-## Files added for GitHub/domain upload
+## Stripe webhook endpoint
+
+While testing on Render:
 
 ```text
-chef-ledger-operational/.gitignore
-chef-ledger-operational/CNAME
-chef-ledger-operational/connect-threestarops-github.ps1
-chef-ledger-operational/install-and-push-threestarops-from-downloads.ps1
-chef-ledger-operational/run-threestarops-server.ps1
-chef-ledger-operational/README_GITHUB_UPLOAD_THREESTAROPS.md
-chef-ledger-operational/README.md
+https://YOUR-RENDER-SERVICE.onrender.com/api/stripe/webhook
 ```
+
+After the domain points to Render:
+
+```text
+https://threestarops.com/api/stripe/webhook
+```
+
+Listen for:
+
+```text
+checkout.session.completed
+customer.subscription.created
+customer.subscription.updated
+customer.subscription.deleted
+invoice.payment_succeeded
+invoice.payment_failed
+```
+
+## Signup/payment flow
+
+```text
+1. User creates restaurant profile.
+2. Account is saved as pending_checkout.
+3. User sees the subscription lock screen.
+4. User clicks the Stripe Buy Button for Starter/Kitchen/Chef/Authority.
+5. Stripe sends checkout.session.completed to /api/stripe/webhook.
+6. ThreeStarOps updates the team subscription to active + selected tier.
+7. User refreshes/signs in and the correct tools unlock.
+```
+
+## Local install pattern
+
+```powershell
+cd "C:\Users\ursamajor\Downloads"
+
+Get-Process python -ErrorAction SilentlyContinue | Stop-Process -Force
+
+Unblock-File ".\chef-ledger-operational-render-stripe-v63.zip"
+
+Remove-Item ".\chef-ledger-operational" -Recurse -Force -ErrorAction SilentlyContinue
+
+Expand-Archive -Path ".\chef-ledger-operational-render-stripe-v63.zip" -DestinationPath "." -Force
+
+cd ".\chef-ledger-operational"
+
+powershell -ExecutionPolicy Bypass -File ".\run.ps1"
+```
+
+## Push update to GitHub
+
+```powershell
+cd "C:\Users\ursamajor\Downloads\chef-ledger-operational"
+
+git add .
+git commit -m "Add Render Stripe subscription activation"
+git push origin main
+```
+
+Then redeploy on Render.

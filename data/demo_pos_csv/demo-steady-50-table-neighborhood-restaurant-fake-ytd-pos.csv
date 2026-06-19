@@ -81,6 +81,9 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-08,Lunch,Neighborhood Lunch Plate 01,14,16.0,no,,7,224.0
 2026-06-10,Lunch,Neighborhood Lunch Plate 01,16,16.0,no,,8,256.0
 2026-06-12,Lunch,Neighborhood Lunch Plate 01,22,16.0,no,,11,352.0
+2026-06-14,Lunch,Neighborhood Lunch Plate 01,18,16.0,no,,9,288.0
+2026-06-16,Lunch,Neighborhood Lunch Plate 01,16,16.0,no,,8,256.0
+2026-06-18,Lunch,Neighborhood Lunch Plate 01,12,16.0,no,,6,192.0
 2026-01-02,Lunch,Neighborhood Lunch Plate 02,19,18.5,no,,9,351.5
 2026-01-04,Lunch,Neighborhood Lunch Plate 02,15,18.5,no,,7,277.5
 2026-01-06,Lunch,Neighborhood Lunch Plate 02,7,18.5,no,,3,129.5
@@ -162,6 +165,10 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-07,Lunch,Neighborhood Lunch Plate 02,13,18.5,no,,6,240.5
 2026-06-09,Lunch,Neighborhood Lunch Plate 02,11,18.5,no,,5,203.5
 2026-06-11,Lunch,Neighborhood Lunch Plate 02,7,18.5,no,,3,129.5
+2026-06-13,Lunch,Neighborhood Lunch Plate 02,19,18.5,no,,9,351.5
+2026-06-15,Lunch,Neighborhood Lunch Plate 02,11,18.5,no,,5,203.5
+2026-06-17,Lunch,Neighborhood Lunch Plate 02,7,18.5,no,,3,129.5
+2026-06-19,Lunch,Neighborhood Lunch Plate 02,19,18.5,no,,9,351.5
 2026-01-03,Lunch,Neighborhood Lunch Plate 03,22,21.0,no,,11,462.0
 2026-01-05,Lunch,Neighborhood Lunch Plate 03,8,21.0,no,,4,168.0
 2026-01-07,Lunch,Neighborhood Lunch Plate 03,17,17.64,yes,Chef Special,8,299.88
@@ -243,6 +250,9 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-08,Lunch,Neighborhood Lunch Plate 03,12,21.0,no,,6,252.0
 2026-06-10,Lunch,Neighborhood Lunch Plate 03,8,21.0,no,,4,168.0
 2026-06-12,Lunch,Neighborhood Lunch Plate 03,20,21.0,no,,10,420.0
+2026-06-14,Lunch,Neighborhood Lunch Plate 03,16,21.0,no,,8,336.0
+2026-06-16,Lunch,Neighborhood Lunch Plate 03,8,21.0,no,,4,168.0
+2026-06-18,Lunch,Neighborhood Lunch Plate 03,10,21.0,no,,5,210.0
 2026-01-04,Lunch,Neighborhood Lunch Plate 04,13,23.5,no,,6,305.5
 2026-01-06,Lunch,Neighborhood Lunch Plate 04,11,23.5,no,,5,258.5
 2026-01-08,Lunch,Neighborhood Lunch Plate 04,20,19.74,yes,Chef Special,10,394.8
@@ -323,6 +333,10 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-07,Lunch,Neighborhood Lunch Plate 04,23,23.5,no,,11,540.5
 2026-06-09,Lunch,Neighborhood Lunch Plate 04,15,23.5,no,,7,352.5
 2026-06-11,Lunch,Neighborhood Lunch Plate 04,17,23.5,no,,8,399.5
+2026-06-13,Lunch,Neighborhood Lunch Plate 04,29,23.5,no,,14,681.5
+2026-06-15,Lunch,Neighborhood Lunch Plate 04,15,23.5,no,,7,352.5
+2026-06-17,Lunch,Neighborhood Lunch Plate 04,17,23.5,no,,8,399.5
+2026-06-19,Lunch,Neighborhood Lunch Plate 04,29,23.5,no,,14,681.5
 2026-01-05,Lunch,Neighborhood Lunch Plate 05,12,26.0,no,,6,312.0
 2026-01-07,Lunch,Neighborhood Lunch Plate 05,14,26.0,no,,7,364.0
 2026-01-09,Lunch,Neighborhood Lunch Plate 05,20,26.0,no,,10,520.0
@@ -403,6 +417,9 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-08,Lunch,Neighborhood Lunch Plate 05,10,26.0,no,,5,260.0
 2026-06-10,Lunch,Neighborhood Lunch Plate 05,12,26.0,no,,6,312.0
 2026-06-12,Lunch,Neighborhood Lunch Plate 05,31,21.84,yes,Chef Special,15,677.04
+2026-06-14,Lunch,Neighborhood Lunch Plate 05,14,26.0,no,,7,364.0
+2026-06-16,Lunch,Neighborhood Lunch Plate 05,12,26.0,no,,6,312.0
+2026-06-18,Lunch,Neighborhood Lunch Plate 05,14,26.0,no,,7,364.0
 2026-01-01,Lunch,Neighborhood Lunch Plate 06,16,28.5,no,,8,456.0
 2026-01-03,Lunch,Neighborhood Lunch Plate 06,22,28.5,no,,11,627.0
 2026-01-05,Lunch,Neighborhood Lunch Plate 06,14,28.5,no,,7,399.0
@@ -485,6 +502,9 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-08,Lunch,Neighborhood Lunch Plate 06,12,28.5,no,,6,342.0
 2026-06-10,Lunch,Neighborhood Lunch Plate 06,14,28.5,no,,7,399.0
 2026-06-12,Lunch,Neighborhood Lunch Plate 06,26,28.5,no,,13,741.0
+2026-06-14,Lunch,Neighborhood Lunch Plate 06,16,28.5,no,,8,456.0
+2026-06-16,Lunch,Neighborhood Lunch Plate 06,14,28.5,no,,7,399.0
+2026-06-18,Lunch,Neighborhood Lunch Plate 06,16,28.5,no,,8,456.0
 2026-01-02,Lunch,Neighborhood Lunch Plate 07,23,31.0,no,,11,713.0
 2026-01-04,Lunch,Neighborhood Lunch Plate 07,19,31.0,no,,9,589.0
 2026-01-06,Lunch,Neighborhood Lunch Plate 07,17,31.0,no,,8,527.0
@@ -566,6 +586,10 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-07,Lunch,Neighborhood Lunch Plate 07,30,26.04,yes,Chef Special,15,781.2
 2026-06-09,Lunch,Neighborhood Lunch Plate 07,21,31.0,no,,10,651.0
 2026-06-11,Lunch,Neighborhood Lunch Plate 07,23,31.0,no,,11,713.0
+2026-06-13,Lunch,Neighborhood Lunch Plate 07,29,31.0,no,,14,899.0
+2026-06-15,Lunch,Neighborhood Lunch Plate 07,21,31.0,no,,10,651.0
+2026-06-17,Lunch,Neighborhood Lunch Plate 07,23,31.0,no,,11,713.0
+2026-06-19,Lunch,Neighborhood Lunch Plate 07,29,31.0,no,,14,899.0
 2026-01-03,Lunch,Neighborhood Lunch Plate 08,26,33.5,no,,13,871.0
 2026-01-05,Lunch,Neighborhood Lunch Plate 08,18,33.5,no,,9,603.0
 2026-01-07,Lunch,Neighborhood Lunch Plate 08,14,33.5,no,,7,469.0
@@ -647,6 +671,9 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-08,Lunch,Neighborhood Lunch Plate 08,16,33.5,no,,8,536.0
 2026-06-10,Lunch,Neighborhood Lunch Plate 08,18,33.5,no,,9,603.0
 2026-06-12,Lunch,Neighborhood Lunch Plate 08,24,33.5,no,,12,804.0
+2026-06-14,Lunch,Neighborhood Lunch Plate 08,20,33.5,no,,10,670.0
+2026-06-16,Lunch,Neighborhood Lunch Plate 08,18,33.5,no,,9,603.0
+2026-06-18,Lunch,Neighborhood Lunch Plate 08,14,33.5,no,,7,469.0
 2026-01-04,Lunch,Neighborhood Lunch Plate 09,23,36.0,no,,11,828.0
 2026-01-06,Lunch,Neighborhood Lunch Plate 09,15,36.0,no,,7,540.0
 2026-01-08,Lunch,Neighborhood Lunch Plate 09,17,36.0,no,,8,612.0
@@ -727,6 +754,10 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-07,Lunch,Neighborhood Lunch Plate 09,21,36.0,no,,10,756.0
 2026-06-09,Lunch,Neighborhood Lunch Plate 09,19,36.0,no,,9,684.0
 2026-06-11,Lunch,Neighborhood Lunch Plate 09,15,36.0,no,,7,540.0
+2026-06-13,Lunch,Neighborhood Lunch Plate 09,27,36.0,no,,13,972.0
+2026-06-15,Lunch,Neighborhood Lunch Plate 09,19,36.0,no,,9,684.0
+2026-06-17,Lunch,Neighborhood Lunch Plate 09,15,36.0,no,,7,540.0
+2026-06-19,Lunch,Neighborhood Lunch Plate 09,27,36.0,no,,13,972.0
 2026-01-05,Lunch,Neighborhood Lunch Plate 10,16,38.5,no,,8,616.0
 2026-01-07,Lunch,Neighborhood Lunch Plate 10,25,32.34,yes,Chef Special,12,808.5
 2026-01-09,Lunch,Neighborhood Lunch Plate 10,30,38.5,no,,15,1155.0
@@ -807,6 +838,9 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-08,Lunch,Neighborhood Lunch Plate 10,26,38.5,no,,13,1001.0
 2026-06-10,Lunch,Neighborhood Lunch Plate 10,22,38.5,no,,11,847.0
 2026-06-12,Lunch,Neighborhood Lunch Plate 10,34,38.5,no,,17,1309.0
+2026-06-14,Lunch,Neighborhood Lunch Plate 10,30,38.5,no,,15,1155.0
+2026-06-16,Lunch,Neighborhood Lunch Plate 10,22,38.5,no,,11,847.0
+2026-06-18,Lunch,Neighborhood Lunch Plate 10,24,38.5,no,,12,924.0
 2026-01-01,Lunch,Neighborhood Lunch Plate 11,27,34.44,yes,Chef Special,13,929.88
 2026-01-03,Lunch,Neighborhood Lunch Plate 11,26,41.0,no,,13,1066.0
 2026-01-05,Lunch,Neighborhood Lunch Plate 11,18,41.0,no,,9,738.0
@@ -889,6 +923,9 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-08,Lunch,Neighborhood Lunch Plate 11,16,41.0,no,,8,656.0
 2026-06-10,Lunch,Neighborhood Lunch Plate 11,18,41.0,no,,9,738.0
 2026-06-12,Lunch,Neighborhood Lunch Plate 11,30,41.0,no,,15,1230.0
+2026-06-14,Lunch,Neighborhood Lunch Plate 11,20,41.0,no,,10,820.0
+2026-06-16,Lunch,Neighborhood Lunch Plate 11,18,41.0,no,,9,738.0
+2026-06-18,Lunch,Neighborhood Lunch Plate 11,27,34.44,yes,Chef Special,13,929.88
 2026-01-02,Lunch,Neighborhood Lunch Plate 12,34,36.54,yes,Chef Special,17,1242.36
 2026-01-04,Lunch,Neighborhood Lunch Plate 12,23,43.5,no,,11,1000.5
 2026-01-06,Lunch,Neighborhood Lunch Plate 12,21,43.5,no,,10,913.5
@@ -970,6 +1007,10 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-07,Lunch,Neighborhood Lunch Plate 12,21,43.5,no,,10,913.5
 2026-06-09,Lunch,Neighborhood Lunch Plate 12,19,43.5,no,,9,826.5
 2026-06-11,Lunch,Neighborhood Lunch Plate 12,21,43.5,no,,10,913.5
+2026-06-13,Lunch,Neighborhood Lunch Plate 12,27,43.5,no,,13,1174.5
+2026-06-15,Lunch,Neighborhood Lunch Plate 12,19,43.5,no,,9,826.5
+2026-06-17,Lunch,Neighborhood Lunch Plate 12,21,43.5,no,,10,913.5
+2026-06-19,Lunch,Neighborhood Lunch Plate 12,34,36.54,yes,Chef Special,17,1242.36
 2026-01-03,Lunch,Neighborhood Lunch Plate 13,30,16.0,no,,15,480.0
 2026-01-05,Lunch,Neighborhood Lunch Plate 13,22,16.0,no,,11,352.0
 2026-01-07,Lunch,Neighborhood Lunch Plate 13,18,16.0,no,,9,288.0
@@ -1051,6 +1092,9 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-08,Lunch,Neighborhood Lunch Plate 13,26,16.0,no,,13,416.0
 2026-06-10,Lunch,Neighborhood Lunch Plate 13,28,16.0,no,,14,448.0
 2026-06-12,Lunch,Neighborhood Lunch Plate 13,34,16.0,no,,17,544.0
+2026-06-14,Lunch,Neighborhood Lunch Plate 13,30,16.0,no,,15,480.0
+2026-06-16,Lunch,Neighborhood Lunch Plate 13,28,16.0,no,,14,448.0
+2026-06-18,Lunch,Neighborhood Lunch Plate 13,24,16.0,no,,12,384.0
 2026-01-04,Lunch,Neighborhood Lunch Plate 14,27,18.5,no,,13,499.5
 2026-01-06,Lunch,Neighborhood Lunch Plate 14,19,18.5,no,,9,351.5
 2026-01-08,Lunch,Neighborhood Lunch Plate 14,21,18.5,no,,10,388.5
@@ -1131,6 +1175,10 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-07,Lunch,Neighborhood Lunch Plate 14,32,15.54,yes,Chef Special,16,497.28
 2026-06-09,Lunch,Neighborhood Lunch Plate 14,23,18.5,no,,11,425.5
 2026-06-11,Lunch,Neighborhood Lunch Plate 14,19,18.5,no,,9,351.5
+2026-06-13,Lunch,Neighborhood Lunch Plate 14,31,18.5,no,,15,573.5
+2026-06-15,Lunch,Neighborhood Lunch Plate 14,23,18.5,no,,11,425.5
+2026-06-17,Lunch,Neighborhood Lunch Plate 14,19,18.5,no,,9,351.5
+2026-06-19,Lunch,Neighborhood Lunch Plate 14,31,18.5,no,,15,573.5
 2026-01-05,Lunch,Neighborhood Lunch Plate 15,6,21.0,no,,3,126.0
 2026-01-07,Lunch,Neighborhood Lunch Plate 15,8,21.0,no,,4,168.0
 2026-01-09,Lunch,Neighborhood Lunch Plate 15,20,21.0,no,,10,420.0
@@ -1211,6 +1259,9 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-08,Lunch,Neighborhood Lunch Plate 15,10,21.0,no,,5,210.0
 2026-06-10,Lunch,Neighborhood Lunch Plate 15,6,21.0,no,,3,126.0
 2026-06-12,Lunch,Neighborhood Lunch Plate 15,18,21.0,no,,9,378.0
+2026-06-14,Lunch,Neighborhood Lunch Plate 15,14,21.0,no,,7,294.0
+2026-06-16,Lunch,Neighborhood Lunch Plate 15,6,21.0,no,,3,126.0
+2026-06-18,Lunch,Neighborhood Lunch Plate 15,8,21.0,no,,4,168.0
 2026-01-01,Lunch,Neighborhood Lunch Plate 16,10,23.5,no,,5,235.0
 2026-01-03,Lunch,Neighborhood Lunch Plate 16,22,23.5,no,,11,517.0
 2026-01-05,Lunch,Neighborhood Lunch Plate 16,8,23.5,no,,4,188.0
@@ -1293,6 +1344,9 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-08,Lunch,Neighborhood Lunch Plate 16,18,23.5,no,,9,423.0
 2026-06-10,Lunch,Neighborhood Lunch Plate 16,14,23.5,no,,7,329.0
 2026-06-12,Lunch,Neighborhood Lunch Plate 16,26,23.5,no,,13,611.0
+2026-06-14,Lunch,Neighborhood Lunch Plate 16,22,23.5,no,,11,517.0
+2026-06-16,Lunch,Neighborhood Lunch Plate 16,14,23.5,no,,7,329.0
+2026-06-18,Lunch,Neighborhood Lunch Plate 16,16,23.5,no,,8,376.0
 2026-01-02,Lunch,Neighborhood Lunch Plate 17,23,26.0,no,,11,598.0
 2026-01-04,Lunch,Neighborhood Lunch Plate 17,13,26.0,no,,6,338.0
 2026-01-06,Lunch,Neighborhood Lunch Plate 17,11,26.0,no,,5,286.0
@@ -1374,6 +1428,10 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-07,Lunch,Neighborhood Lunch Plate 17,17,26.0,no,,8,442.0
 2026-06-09,Lunch,Neighborhood Lunch Plate 17,9,26.0,no,,4,234.0
 2026-06-11,Lunch,Neighborhood Lunch Plate 17,11,26.0,no,,5,286.0
+2026-06-13,Lunch,Neighborhood Lunch Plate 17,23,26.0,no,,11,598.0
+2026-06-15,Lunch,Neighborhood Lunch Plate 17,9,26.0,no,,4,234.0
+2026-06-17,Lunch,Neighborhood Lunch Plate 17,11,26.0,no,,5,286.0
+2026-06-19,Lunch,Neighborhood Lunch Plate 17,23,26.0,no,,11,598.0
 2026-01-03,Lunch,Neighborhood Lunch Plate 18,20,28.5,no,,10,570.0
 2026-01-05,Lunch,Neighborhood Lunch Plate 18,12,28.5,no,,6,342.0
 2026-01-07,Lunch,Neighborhood Lunch Plate 18,14,28.5,no,,7,399.0
@@ -1455,6 +1513,9 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-08,Lunch,Neighborhood Lunch Plate 18,10,28.5,no,,5,285.0
 2026-06-10,Lunch,Neighborhood Lunch Plate 18,12,28.5,no,,6,342.0
 2026-06-12,Lunch,Neighborhood Lunch Plate 18,24,28.5,no,,12,684.0
+2026-06-14,Lunch,Neighborhood Lunch Plate 18,14,28.5,no,,7,399.0
+2026-06-16,Lunch,Neighborhood Lunch Plate 18,12,28.5,no,,6,342.0
+2026-06-18,Lunch,Neighborhood Lunch Plate 18,21,23.94,yes,Chef Special,10,502.74
 2026-01-04,Dinner,Neighborhood Dinner Plate 01,17,31.0,no,,8,527.0
 2026-01-06,Dinner,Neighborhood Dinner Plate 01,15,31.0,no,,7,465.0
 2026-01-08,Dinner,Neighborhood Dinner Plate 01,11,31.0,no,,5,341.0
@@ -1535,6 +1596,10 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-07,Dinner,Neighborhood Dinner Plate 01,21,31.0,no,,10,651.0
 2026-06-09,Dinner,Neighborhood Dinner Plate 01,19,31.0,no,,9,589.0
 2026-06-11,Dinner,Neighborhood Dinner Plate 01,21,31.0,no,,10,651.0
+2026-06-13,Dinner,Neighborhood Dinner Plate 01,27,31.0,no,,13,837.0
+2026-06-15,Dinner,Neighborhood Dinner Plate 01,19,31.0,no,,9,589.0
+2026-06-17,Dinner,Neighborhood Dinner Plate 01,21,31.0,no,,10,651.0
+2026-06-19,Dinner,Neighborhood Dinner Plate 01,34,26.04,yes,Chef Special,17,885.36
 2026-01-05,Dinner,Neighborhood Dinner Plate 02,16,33.5,no,,8,536.0
 2026-01-07,Dinner,Neighborhood Dinner Plate 02,12,33.5,no,,6,402.0
 2026-01-09,Dinner,Neighborhood Dinner Plate 02,24,33.5,no,,12,804.0
@@ -1615,6 +1680,9 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-08,Dinner,Neighborhood Dinner Plate 02,14,33.5,no,,7,469.0
 2026-06-10,Dinner,Neighborhood Dinner Plate 02,16,33.5,no,,8,536.0
 2026-06-12,Dinner,Neighborhood Dinner Plate 02,22,33.5,no,,11,737.0
+2026-06-14,Dinner,Neighborhood Dinner Plate 02,18,33.5,no,,9,603.0
+2026-06-16,Dinner,Neighborhood Dinner Plate 02,16,33.5,no,,8,536.0
+2026-06-18,Dinner,Neighborhood Dinner Plate 02,12,33.5,no,,6,402.0
 2026-01-01,Dinner,Neighborhood Dinner Plate 03,14,36.0,no,,7,504.0
 2026-01-03,Dinner,Neighborhood Dinner Plate 03,26,36.0,no,,13,936.0
 2026-01-05,Dinner,Neighborhood Dinner Plate 03,12,36.0,no,,6,432.0
@@ -1697,6 +1765,9 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-08,Dinner,Neighborhood Dinner Plate 03,16,36.0,no,,8,576.0
 2026-06-10,Dinner,Neighborhood Dinner Plate 03,12,36.0,no,,6,432.0
 2026-06-12,Dinner,Neighborhood Dinner Plate 03,24,36.0,no,,12,864.0
+2026-06-14,Dinner,Neighborhood Dinner Plate 03,20,36.0,no,,10,720.0
+2026-06-16,Dinner,Neighborhood Dinner Plate 03,12,36.0,no,,6,432.0
+2026-06-18,Dinner,Neighborhood Dinner Plate 03,14,36.0,no,,7,504.0
 2026-01-02,Dinner,Neighborhood Dinner Plate 04,27,38.5,no,,13,1039.5
 2026-01-04,Dinner,Neighborhood Dinner Plate 04,17,38.5,no,,8,654.5
 2026-01-06,Dinner,Neighborhood Dinner Plate 04,15,38.5,no,,7,577.5
@@ -1778,6 +1849,10 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-07,Dinner,Neighborhood Dinner Plate 04,27,38.5,no,,13,1039.5
 2026-06-09,Dinner,Neighborhood Dinner Plate 04,19,38.5,no,,9,731.5
 2026-06-11,Dinner,Neighborhood Dinner Plate 04,21,38.5,no,,10,808.5
+2026-06-13,Dinner,Neighborhood Dinner Plate 04,33,38.5,no,,16,1270.5
+2026-06-15,Dinner,Neighborhood Dinner Plate 04,19,38.5,no,,9,731.5
+2026-06-17,Dinner,Neighborhood Dinner Plate 04,21,38.5,no,,10,808.5
+2026-06-19,Dinner,Neighborhood Dinner Plate 04,33,38.5,no,,16,1270.5
 2026-01-03,Dinner,Neighborhood Dinner Plate 05,24,41.0,no,,12,984.0
 2026-01-05,Dinner,Neighborhood Dinner Plate 05,16,41.0,no,,8,656.0
 2026-01-07,Dinner,Neighborhood Dinner Plate 05,18,41.0,no,,9,738.0
@@ -1859,6 +1934,9 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-08,Dinner,Neighborhood Dinner Plate 05,14,41.0,no,,7,574.0
 2026-06-10,Dinner,Neighborhood Dinner Plate 05,16,41.0,no,,8,656.0
 2026-06-12,Dinner,Neighborhood Dinner Plate 05,28,41.0,no,,14,1148.0
+2026-06-14,Dinner,Neighborhood Dinner Plate 05,18,41.0,no,,9,738.0
+2026-06-16,Dinner,Neighborhood Dinner Plate 05,16,41.0,no,,8,656.0
+2026-06-18,Dinner,Neighborhood Dinner Plate 05,18,41.0,no,,9,738.0
 2026-01-04,Dinner,Neighborhood Dinner Plate 06,21,43.5,no,,10,913.5
 2026-01-06,Dinner,Neighborhood Dinner Plate 06,19,43.5,no,,9,826.5
 2026-01-08,Dinner,Neighborhood Dinner Plate 06,15,43.5,no,,7,652.5
@@ -1939,6 +2017,10 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-07,Dinner,Neighborhood Dinner Plate 06,19,43.5,no,,9,826.5
 2026-06-09,Dinner,Neighborhood Dinner Plate 06,17,43.5,no,,8,739.5
 2026-06-11,Dinner,Neighborhood Dinner Plate 06,19,43.5,no,,9,826.5
+2026-06-13,Dinner,Neighborhood Dinner Plate 06,25,43.5,no,,12,1087.5
+2026-06-15,Dinner,Neighborhood Dinner Plate 06,17,43.5,no,,8,739.5
+2026-06-17,Dinner,Neighborhood Dinner Plate 06,19,43.5,no,,9,826.5
+2026-06-19,Dinner,Neighborhood Dinner Plate 06,25,43.5,no,,12,1087.5
 2026-01-05,Dinner,Neighborhood Dinner Plate 07,20,16.0,no,,10,320.0
 2026-01-07,Dinner,Neighborhood Dinner Plate 07,16,16.0,no,,8,256.0
 2026-01-09,Dinner,Neighborhood Dinner Plate 07,28,16.0,no,,14,448.0
@@ -2019,6 +2101,9 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-08,Dinner,Neighborhood Dinner Plate 07,24,16.0,no,,12,384.0
 2026-06-10,Dinner,Neighborhood Dinner Plate 07,26,16.0,no,,13,416.0
 2026-06-12,Dinner,Neighborhood Dinner Plate 07,32,16.0,no,,16,512.0
+2026-06-14,Dinner,Neighborhood Dinner Plate 07,28,16.0,no,,14,448.0
+2026-06-16,Dinner,Neighborhood Dinner Plate 07,26,16.0,no,,13,416.0
+2026-06-18,Dinner,Neighborhood Dinner Plate 07,29,13.44,yes,Chef Special,14,389.76
 2026-01-01,Dinner,Neighborhood Dinner Plate 08,18,18.5,no,,9,333.0
 2026-01-03,Dinner,Neighborhood Dinner Plate 08,30,18.5,no,,15,555.0
 2026-01-05,Dinner,Neighborhood Dinner Plate 08,22,18.5,no,,11,407.0
@@ -2101,6 +2186,9 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-08,Dinner,Neighborhood Dinner Plate 08,20,18.5,no,,10,370.0
 2026-06-10,Dinner,Neighborhood Dinner Plate 08,22,18.5,no,,11,407.0
 2026-06-12,Dinner,Neighborhood Dinner Plate 08,35,15.54,yes,Chef Special,17,543.9
+2026-06-14,Dinner,Neighborhood Dinner Plate 08,24,18.5,no,,12,444.0
+2026-06-16,Dinner,Neighborhood Dinner Plate 08,22,18.5,no,,11,407.0
+2026-06-18,Dinner,Neighborhood Dinner Plate 08,18,18.5,no,,9,333.0
 2026-01-02,Dinner,Neighborhood Dinner Plate 09,31,21.0,no,,15,651.0
 2026-01-04,Dinner,Neighborhood Dinner Plate 09,27,21.0,no,,13,567.0
 2026-01-06,Dinner,Neighborhood Dinner Plate 09,19,21.0,no,,9,399.0
@@ -2182,6 +2270,10 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-07,Dinner,Neighborhood Dinner Plate 09,25,21.0,no,,12,525.0
 2026-06-09,Dinner,Neighborhood Dinner Plate 09,23,21.0,no,,11,483.0
 2026-06-11,Dinner,Neighborhood Dinner Plate 09,19,21.0,no,,9,399.0
+2026-06-13,Dinner,Neighborhood Dinner Plate 09,38,17.64,yes,Chef Special,19,670.32
+2026-06-15,Dinner,Neighborhood Dinner Plate 09,23,21.0,no,,11,483.0
+2026-06-17,Dinner,Neighborhood Dinner Plate 09,19,21.0,no,,9,399.0
+2026-06-19,Dinner,Neighborhood Dinner Plate 09,31,21.0,no,,15,651.0
 2026-01-03,Dinner,Neighborhood Dinner Plate 10,34,23.5,no,,17,799.0
 2026-01-05,Dinner,Neighborhood Dinner Plate 10,20,23.5,no,,10,470.0
 2026-01-07,Dinner,Neighborhood Dinner Plate 10,22,23.5,no,,11,517.0
@@ -2263,6 +2355,9 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-08,Dinner,Neighborhood Dinner Plate 10,30,23.5,no,,15,705.0
 2026-06-10,Dinner,Neighborhood Dinner Plate 10,26,23.5,no,,13,611.0
 2026-06-12,Dinner,Neighborhood Dinner Plate 10,38,23.5,no,,19,893.0
+2026-06-14,Dinner,Neighborhood Dinner Plate 10,34,23.5,no,,17,799.0
+2026-06-16,Dinner,Neighborhood Dinner Plate 10,26,23.5,no,,13,611.0
+2026-06-18,Dinner,Neighborhood Dinner Plate 10,28,23.5,no,,14,658.0
 2026-01-04,Dinner,Neighborhood Dinner Plate 11,11,26.0,no,,5,286.0
 2026-01-06,Dinner,Neighborhood Dinner Plate 11,9,26.0,no,,4,234.0
 2026-01-08,Dinner,Neighborhood Dinner Plate 11,11,26.0,no,,5,286.0
@@ -2343,6 +2438,10 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-07,Dinner,Neighborhood Dinner Plate 11,15,26.0,no,,7,390.0
 2026-06-09,Dinner,Neighborhood Dinner Plate 11,7,26.0,no,,3,182.0
 2026-06-11,Dinner,Neighborhood Dinner Plate 11,9,26.0,no,,4,234.0
+2026-06-13,Dinner,Neighborhood Dinner Plate 11,21,26.0,no,,10,546.0
+2026-06-15,Dinner,Neighborhood Dinner Plate 11,7,26.0,no,,3,182.0
+2026-06-17,Dinner,Neighborhood Dinner Plate 11,9,26.0,no,,4,234.0
+2026-06-19,Dinner,Neighborhood Dinner Plate 11,21,26.0,no,,10,546.0
 2026-01-05,Dinner,Neighborhood Dinner Plate 12,10,28.5,no,,5,285.0
 2026-01-07,Dinner,Neighborhood Dinner Plate 12,12,28.5,no,,6,342.0
 2026-01-09,Dinner,Neighborhood Dinner Plate 12,18,28.5,no,,9,513.0
@@ -2423,6 +2522,9 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-08,Dinner,Neighborhood Dinner Plate 12,8,28.5,no,,4,228.0
 2026-06-10,Dinner,Neighborhood Dinner Plate 12,10,28.5,no,,5,285.0
 2026-06-12,Dinner,Neighborhood Dinner Plate 12,22,28.5,no,,11,627.0
+2026-06-14,Dinner,Neighborhood Dinner Plate 12,12,28.5,no,,6,342.0
+2026-06-16,Dinner,Neighborhood Dinner Plate 12,10,28.5,no,,5,285.0
+2026-06-18,Dinner,Neighborhood Dinner Plate 12,12,28.5,no,,6,342.0
 2026-01-01,Dinner,Neighborhood Dinner Plate 13,8,31.0,no,,4,248.0
 2026-01-03,Dinner,Neighborhood Dinner Plate 13,20,31.0,no,,10,620.0
 2026-01-05,Dinner,Neighborhood Dinner Plate 13,12,31.0,no,,6,372.0
@@ -2505,6 +2607,9 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-08,Dinner,Neighborhood Dinner Plate 13,16,31.0,no,,8,496.0
 2026-06-10,Dinner,Neighborhood Dinner Plate 13,18,31.0,no,,9,558.0
 2026-06-12,Dinner,Neighborhood Dinner Plate 13,24,31.0,no,,12,744.0
+2026-06-14,Dinner,Neighborhood Dinner Plate 13,20,31.0,no,,10,620.0
+2026-06-16,Dinner,Neighborhood Dinner Plate 13,18,31.0,no,,9,558.0
+2026-06-18,Dinner,Neighborhood Dinner Plate 13,14,31.0,no,,7,434.0
 2026-01-02,Dinner,Neighborhood Dinner Plate 14,21,33.5,no,,10,703.5
 2026-01-04,Dinner,Neighborhood Dinner Plate 14,17,33.5,no,,8,569.5
 2026-01-06,Dinner,Neighborhood Dinner Plate 14,9,33.5,no,,4,301.5
@@ -2586,6 +2691,10 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-07,Dinner,Neighborhood Dinner Plate 14,15,33.5,no,,7,502.5
 2026-06-09,Dinner,Neighborhood Dinner Plate 14,13,33.5,no,,6,435.5
 2026-06-11,Dinner,Neighborhood Dinner Plate 14,9,33.5,no,,4,301.5
+2026-06-13,Dinner,Neighborhood Dinner Plate 14,21,33.5,no,,10,703.5
+2026-06-15,Dinner,Neighborhood Dinner Plate 14,13,33.5,no,,6,435.5
+2026-06-17,Dinner,Neighborhood Dinner Plate 14,9,33.5,no,,4,301.5
+2026-06-19,Dinner,Neighborhood Dinner Plate 14,21,33.5,no,,10,703.5
 2026-01-03,Dinner,Neighborhood Dinner Plate 15,24,36.0,no,,12,864.0
 2026-01-05,Dinner,Neighborhood Dinner Plate 15,10,36.0,no,,5,360.0
 2026-01-07,Dinner,Neighborhood Dinner Plate 15,12,36.0,no,,6,432.0
@@ -2667,6 +2776,9 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-08,Dinner,Neighborhood Dinner Plate 15,14,36.0,no,,7,504.0
 2026-06-10,Dinner,Neighborhood Dinner Plate 15,10,36.0,no,,5,360.0
 2026-06-12,Dinner,Neighborhood Dinner Plate 15,29,30.24,yes,Chef Special,14,876.96
+2026-06-14,Dinner,Neighborhood Dinner Plate 15,18,36.0,no,,9,648.0
+2026-06-16,Dinner,Neighborhood Dinner Plate 15,10,36.0,no,,5,360.0
+2026-06-18,Dinner,Neighborhood Dinner Plate 15,12,36.0,no,,6,432.0
 2026-01-04,Dinner,Neighborhood Dinner Plate 16,15,38.5,no,,7,577.5
 2026-01-06,Dinner,Neighborhood Dinner Plate 16,13,38.5,no,,6,500.5
 2026-01-08,Dinner,Neighborhood Dinner Plate 16,15,38.5,no,,7,577.5
@@ -2747,6 +2859,10 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-07,Dinner,Neighborhood Dinner Plate 16,25,38.5,no,,12,962.5
 2026-06-09,Dinner,Neighborhood Dinner Plate 16,17,38.5,no,,8,654.5
 2026-06-11,Dinner,Neighborhood Dinner Plate 16,19,38.5,no,,9,731.5
+2026-06-13,Dinner,Neighborhood Dinner Plate 16,38,32.34,yes,Chef Special,19,1228.92
+2026-06-15,Dinner,Neighborhood Dinner Plate 16,17,38.5,no,,8,654.5
+2026-06-17,Dinner,Neighborhood Dinner Plate 16,19,38.5,no,,9,731.5
+2026-06-19,Dinner,Neighborhood Dinner Plate 16,31,38.5,no,,15,1193.5
 2026-01-05,Dinner,Neighborhood Dinner Plate 17,14,41.0,no,,7,574.0
 2026-01-07,Dinner,Neighborhood Dinner Plate 17,16,41.0,no,,8,656.0
 2026-01-09,Dinner,Neighborhood Dinner Plate 17,22,41.0,no,,11,902.0
@@ -2827,6 +2943,9 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-08,Dinner,Neighborhood Dinner Plate 17,12,41.0,no,,6,492.0
 2026-06-10,Dinner,Neighborhood Dinner Plate 17,14,41.0,no,,7,574.0
 2026-06-12,Dinner,Neighborhood Dinner Plate 17,26,41.0,no,,13,1066.0
+2026-06-14,Dinner,Neighborhood Dinner Plate 17,16,41.0,no,,8,656.0
+2026-06-16,Dinner,Neighborhood Dinner Plate 17,14,41.0,no,,7,574.0
+2026-06-18,Dinner,Neighborhood Dinner Plate 17,16,41.0,no,,8,656.0
 2026-01-01,Dinner,Neighborhood Dinner Plate 18,18,43.5,no,,9,783.0
 2026-01-03,Dinner,Neighborhood Dinner Plate 18,24,43.5,no,,12,1044.0
 2026-01-05,Dinner,Neighborhood Dinner Plate 18,16,43.5,no,,8,696.0
@@ -2909,3 +3028,6 @@ business_date,service_period,plate,qty_sold,price_sold_at,special,discount_name,
 2026-06-08,Dinner,Neighborhood Dinner Plate 18,14,43.5,no,,7,609.0
 2026-06-10,Dinner,Neighborhood Dinner Plate 18,16,43.5,no,,8,696.0
 2026-06-12,Dinner,Neighborhood Dinner Plate 18,28,43.5,no,,14,1218.0
+2026-06-14,Dinner,Neighborhood Dinner Plate 18,18,43.5,no,,9,783.0
+2026-06-16,Dinner,Neighborhood Dinner Plate 18,16,43.5,no,,8,696.0
+2026-06-18,Dinner,Neighborhood Dinner Plate 18,18,43.5,no,,9,783.0

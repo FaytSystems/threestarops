@@ -2246,3 +2246,18 @@ input, select, textarea {
   .subscription-lock-card .pricing-grid,
   .pricing-grid { grid-template-columns: 1fr; }
 }
+
+/* Path: chef-ledger-operational/static/styles.css
+   v63 additions: Stripe Buy Button subscription checkout support */
+.stripe-buy-button-wrap {
+  margin-top: 14px;
+  padding: 10px;
+  border: 1px solid rgba(203,166,90,.24);
+  border-radius: 14px;
+  background: rgba(8,8,8,.28);
+}
+.tiny-note {
+  font-size: .78rem;
+  line-height: 1.35;
+  margin-top: 8px;
+}
