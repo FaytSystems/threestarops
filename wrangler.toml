@@ -7,7 +7,7 @@ pages_build_output_dir = "static"
 [[d1_databases]]
 binding = "DB"
 database_name = "threestarops-db"
-database_id = "PASTE_D1_DATABASE_ID_HERE"
+database_id = "ba662e44-bce7-49cb-9fac-4669fa3907e4"
 
 # Optional but recommended for uploaded pictures/CSVs later.
 # Keep binding = "FILES_BUCKET" exactly because the Pages Function expects env.FILES_BUCKET.
