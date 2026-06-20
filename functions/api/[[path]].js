@@ -8,7 +8,7 @@ const BUY_BUTTONS = {
 };
 
 const TIER_ORDER = ['starter', 'kitchen', 'chef', 'authority'];
-const PASSWORD_ITERATIONS = 100000; // Cloudflare Workers PBKDF2 supports up to 100,000 iterations.
+const PASSWORD_ITERATIONS = 100000; // Cloudflare Workers PBKDF2 supports up to 100,000 iterations; do not raise above this on Cloudflare.
 
 const TIERS = [
   { key: 'starter', name: 'Starter', price: 10, tagline: 'Drop the pen and paper.', best_for: 'Small kitchens getting counts, par sheets, and menu lists out of notebooks.', features: ['Email signup and secure account', 'Basic inventory builder', 'Simple menu CSV', 'Starter saved counts', '1 GB FILES cap'], limits: { tier: 'starter', storage_mb: 1024, saved_inventories: 5, inventory_snapshots: 5, saved_counts: 7, count_snapshots: 7, saved_orders: 7, delivery_records: 7, menu_level: 'csv', qr: false }, stripe_buy_button_id: BUY_BUTTONS.starter, stripe_publishable_key: STRIPE_PUBLISHABLE_KEY },
@@ -311,7 +311,7 @@ async function handleTeamAndSchedule(env, row, method, path, body, url) {
 async function handleApi(context) {
   const { request, env, params } = context; if (!env.DB) return bad('Cloudflare D1 binding DB is missing. Add a D1 binding named DB to the Pages project.', 500); await ensureSchema(env);
   const method = request.method.toUpperCase(); const path = Array.isArray(params.path) ? params.path.join('/') : (params.path || ''); const url = new URL(request.url);
-  if (method === 'GET' && path === 'health') return json({ ok: true, runtime: 'cloudflare-pages-functions', d1: true, r2: Boolean(env.FILES_BUCKET), version: 'v66-cloudflare-demo-pbkdf2-fix' });
+  if (method === 'GET' && path === 'health') return json({ ok: true, runtime: 'cloudflare-pages-functions', d1: true, r2: Boolean(env.FILES_BUCKET), version: 'v67-cloudflare-create-account-fix' });
   if (method === 'GET' && path === 'subscription/tiers') return json({ tiers: TIERS });
   if (method === 'POST' && path === 'stripe/webhook') return handleStripeWebhook(env, request);
   if (method === 'GET' && path.startsWith('recipebook/')) return recipebook(env, path.split('/').pop());

@@ -76,3 +76,8 @@ Demo users are seeded with fake vendors, products, plates, stations, locations, 
 ## v66 hotfix
 
 Full-file rewrites included `functions/api/[[path]].js`, `static/app.js`, and `README.md`. This release lowers the Cloudflare PBKDF2 password hashing iteration count to the supported maximum of 100,000 and adds a dedicated `/api/auth/demo` route so the main landing-page demo buttons open active authority-tier demo accounts without relying on a password checkout flow.
+
+
+## v67 Cloudflare create-account/cache hotfix
+
+Full-file rewrites included `static/index.html`, `static/app.js`, `functions/api/[[path]].js`, and `README.md`. This release keeps PBKDF2 at Cloudflare's supported maximum of 100,000 iterations, updates the static asset cache-busting query strings to `v=67`, and makes the Create Account form immediately move a newly registered user to the subscription checkout lock screen instead of waiting on a follow-up session reload. Demo buttons continue to use `/api/auth/demo` for direct demo account login.

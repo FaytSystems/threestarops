@@ -3855,10 +3855,26 @@ function submitAuth(path) {
   return async (e) => {
     e.preventDefault();
     try {
-      await api(path, { method: 'POST', body: JSON.stringify(formData(e.target)) });
-      toast(path === '/api/auth/register' ? 'Profile created. Choose checkout to activate your subscription.' : 'Welcome to Chef Ledger');
+      const payload = await api(path, { method: 'POST', body: JSON.stringify(formData(e.target)) });
+      if (path === '/api/auth/register') {
+        toast('Profile created. Choose checkout to activate your subscription.');
+        if (payload.tiers) state.subscriptionTiers = payload.tiers;
+        if (payload.user) state.user = payload.user;
+        if (payload.team) state.team = payload.team;
+        if (payload.subscription) state.subscription = payload.subscription;
+        const pending = payload.subscription && !payload.subscription.active;
+        if (pending) {
+          showSubscriptionLock({ subscription: payload.subscription, tiers: payload.tiers || state.subscriptionTiers });
+          return;
+        }
+      } else {
+        toast('Welcome to ThreeStarOps');
+      }
       await loadSession();
-    } catch (err) { toast(err.message); }
+    } catch (err) {
+      if (err.status === 402 && err.data?.subscription_required) return;
+      toast(err.message);
+    }
   };
 }
 
