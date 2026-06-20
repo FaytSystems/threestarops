@@ -115,6 +115,30 @@ function canUse(tool) { return Boolean(state.capabilities?.[tool] || isLeader())
 function canViewManagerSchedule() { return Boolean(isLeader() || state.capabilities?.scheduler || state.capabilities?.scheduler_read || state.capabilities?.scheduler_write || state.capabilities?.station); }
 function canWriteSchedule() { return Boolean(isLeader() || state.capabilities?.scheduler_write); }
 function todayInput() { return new Date().toISOString().slice(0, 10); }
+function downloadTextFile(filename, text, type = 'text/plain;charset=utf-8') {
+  const blob = new Blob([String(text || '')], { type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+function printHtml(title, bodyHtml) {
+  const win = window.open('', '_blank');
+  if (!win) return toast('Popup blocked. Allow popups to print this file.');
+  win.document.write(`<!doctype html><html><head><title>${escapeHtml(title)}</title><link rel="stylesheet" href="/styles.css"></head><body class="print-body"><main class="print-page"><h1>${escapeHtml(title)}</h1>${bodyHtml}</main><script>window.onload=()=>window.print();<\/script></body></html>`);
+  win.document.close();
+}
+function printElementById(id, title) {
+  const el = document.getElementById(id);
+  printHtml(title, el?.innerHTML || '<p>No saved file content loaded yet.</p>');
+}
+function emailReady(subject, body) {
+  window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
 
 function productLabel(p) { return `${p.name}${p.category ? ' · ' + p.category : ''}${p.unit ? ' (' + p.unit + ')' : ''}`; }
 function recipeLabel(r) { return `${r.name}${r.station ? ' · ' + r.station : ''}`; }
@@ -2181,7 +2205,8 @@ async function submitStationCount(e) {
     const prepQty = minQty > 0 ? Math.max(minQty - postQty, 0.001) : (Number(x.post_stocked_qty || x.pre_stocked_qty || 1) || 1);
     return {
       kind: 'product',
-      id: Number(x.product_id),
+      id: x.product_id,
+      name: product?.name || 'Station prep item',
       qty: prepQty,
       unit: product?.unit || x.min_station_unit || 'each',
       flags: { need_before_start: true },
@@ -2324,6 +2349,14 @@ function downloadSelectedOrderSheetCsv() {
   a.download = `chef-ledger-${String(group.vendor).replace(/[^a-z0-9]+/gi, '-').toLowerCase()}-order-sheet-${todayInput()}.csv`;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+function printOrderById(id) {
+  const order = state.orders.find(o => String(o.id) === String(id));
+  if (!order) return toast('Order not found yet. Refresh orders and try again.');
+  const lines = Array.isArray(order.lines) ? order.lines : [];
+  const rows = lines.map(line => `<tr><td>${escapeHtml(line.product_name || line.name || '')}</td><td>${qty(line.suggested_order || line.qty || 0)}</td><td>${escapeHtml(line.unit || '')}</td><td>${escapeHtml(line.risk || '')}</td></tr>`).join('');
+  printHtml(order.title || 'Forecast order sheet', `<p><strong>${escapeHtml(order.vendor_name || 'Unassigned vendor')}</strong> · ${escapeHtml(order.status || '')}</p><table><thead><tr><th>Item</th><th>Qty</th><th>Unit</th><th>Risk</th></tr></thead><tbody>${rows || '<tr><td colspan="4">No order lines saved.</td></tr>'}</tbody></table>`);
 }
 
 async function loadOrders() {
@@ -3527,7 +3560,7 @@ function setupEvents() {
       const priorityBtn = e.target.closest('.edit-task-priority');
       if (priorityBtn) { await updateTaskPriority(priorityBtn.dataset.id, priorityBtn.dataset.priority); return; }
       const printOrderBtn = e.target.closest('.print-order');
-      if (printOrderBtn) { window.open(`/print/order/${printOrderBtn.dataset.id}.html`, '_blank'); return; }
+      if (printOrderBtn) { printOrderById(printOrderBtn.dataset.id); return; }
       const receiveBtn = e.target.closest('.receive-order');
       if (receiveBtn) { await receiveOrder(receiveBtn.dataset.id); return; }
       const claimBtn = e.target.closest('.claim-shift');
@@ -4035,8 +4068,7 @@ async function saveEmployeeScheduleProfile(e) {
 }
 
 function printWeeklySchedule() {
-  const weekStart = $('#scheduleWeekStart')?.value || mondayOf(new Date()).toISOString().slice(0, 10);
-  window.open(`/print/schedule/${weekStart}.html?start=${encodeURIComponent(weekStart)}`, '_blank');
+  printElementById('weeklyScheduleBoard', 'Chef Ledger Weekly Schedule');
 }
 
 function downloadScheduleCsv() {
