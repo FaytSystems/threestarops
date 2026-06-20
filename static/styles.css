@@ -2261,3 +2261,460 @@ input, select, textarea {
   line-height: 1.35;
   margin-top: 8px;
 }
+
+/* v68 premium website polish */
+:root {
+  --bg: #070806;
+  --panel: rgba(12, 15, 13, .9);
+  --panel-2: rgba(24, 26, 20, .88);
+  --paper: #fff7e8;
+  --paper-2: #f6f0e2;
+  --ink: #fff8ec;
+  --muted: #cabfa9;
+  --line: rgba(255,255,255,.14);
+  --gold: #efc566;
+  --gold-soft: #b7772d;
+  --sage: #8aa17d;
+  --teal: #79c9bf;
+  --wine: #a75363;
+  --shadow: 0 24px 80px rgba(0,0,0,.42);
+  --radius: 18px;
+}
+
+body {
+  background:
+    linear-gradient(180deg, rgba(4,6,5,.66), rgba(4,6,5,.92) 58%, rgba(4,6,5,.98)),
+    linear-gradient(135deg, rgba(239,197,102,.16), rgba(121,201,191,.08) 48%, rgba(167,83,99,.10)),
+    url('assets/images/three-star-ops-kitchen-hero.png') center top / cover fixed no-repeat,
+    var(--bg);
+  color: var(--ink);
+  text-rendering: optimizeLegibility;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255,255,255,.025) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: linear-gradient(180deg, rgba(0,0,0,.35), transparent 70%);
+}
+
+h1, h2, h3,
+.dashboard-hero-copy h2 {
+  letter-spacing: 0;
+}
+
+.auth-shell {
+  min-height: 100svh;
+  padding: clamp(16px, 3vw, 34px);
+  gap: clamp(14px, 2vw, 22px);
+}
+
+#authScreen.auth-shell {
+  grid-template-columns: minmax(420px, 1.18fr) minmax(320px, .78fr) minmax(320px, .74fr);
+}
+
+.auth-card,
+.card {
+  border-color: rgba(255,255,255,.13);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.025)),
+    rgba(9,11,10,.82);
+  box-shadow: 0 20px 65px rgba(0,0,0,.42);
+}
+
+#authScreen .auth-card {
+  min-height: auto;
+}
+
+.brand-panel {
+  justify-content: flex-end;
+  min-height: min(780px, calc(100svh - 68px));
+  isolation: isolate;
+  background:
+    linear-gradient(180deg, rgba(3,5,4,.12), rgba(3,5,4,.88) 72%),
+    linear-gradient(110deg, rgba(3,5,4,.9) 0%, rgba(3,5,4,.52) 48%, rgba(3,5,4,.2) 100%),
+    url('assets/images/three-star-ops-kitchen-hero.png') center / cover no-repeat;
+}
+
+.brand-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, rgba(239,197,102,.22), transparent 38%),
+    linear-gradient(180deg, transparent 0%, rgba(6,8,7,.72) 76%);
+  pointer-events: none;
+}
+
+.brand-panel::after {
+  inset: auto 0 0;
+  height: 42%;
+  border-radius: 0;
+  background: linear-gradient(180deg, transparent, rgba(5,7,6,.82));
+  z-index: -1;
+}
+
+.hero-brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: clamp(20px, 3vw, 34px);
+}
+
+.hero-brand-lockup .mark {
+  margin: 0;
+  box-shadow: 0 16px 38px rgba(0,0,0,.35), 0 0 0 1px rgba(255,255,255,.2) inset;
+}
+
+.hero-brand-lockup span,
+.hero-brand-lockup strong {
+  display: block;
+}
+
+.hero-brand-lockup span {
+  color: var(--muted);
+  font-size: .78rem;
+  text-transform: uppercase;
+  letter-spacing: .18em;
+  font-weight: 800;
+}
+
+.hero-brand-lockup strong {
+  color: var(--paper);
+  font-size: clamp(1.05rem, 2vw, 1.35rem);
+}
+
+.brand-panel h1 {
+  max-width: 100%;
+  font-family: var(--font);
+  font-size: clamp(2.65rem, 4.2vw, 4.2rem);
+  line-height: .98;
+  text-transform: uppercase;
+  overflow-wrap: normal;
+}
+
+.brand-panel .lead-copy {
+  max-width: 68ch;
+  color: rgba(255,248,236,.9);
+  font-size: clamp(1.02rem, 1.4vw, 1.2rem);
+}
+
+.hero-proof-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 22px 0 14px;
+}
+
+.hero-proof-grid div {
+  min-height: 88px;
+  display: grid;
+  align-content: space-between;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 14px;
+  padding: 13px;
+  background: rgba(0,0,0,.26);
+  backdrop-filter: blur(12px);
+}
+
+.hero-proof-grid strong {
+  color: var(--paper);
+  font-size: 1.05rem;
+}
+
+.hero-proof-grid span {
+  color: var(--muted);
+  font-size: .82rem;
+  line-height: 1.35;
+}
+
+.ops-preview-panel {
+  max-width: 560px;
+  border: 1px solid rgba(239,197,102,.25);
+  border-radius: 16px;
+  padding: 12px;
+  background: linear-gradient(135deg, rgba(9,12,10,.78), rgba(45,37,22,.46));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+.ops-preview-head,
+.ops-preview-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+}
+
+.ops-preview-head {
+  padding-bottom: 10px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid rgba(255,255,255,.1);
+}
+
+.ops-preview-head span,
+.ops-preview-row span {
+  color: var(--muted);
+}
+
+.ops-preview-head strong {
+  color: var(--teal);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  font-size: .76rem;
+}
+
+.ops-preview-row {
+  padding: 8px 0;
+  color: var(--paper);
+}
+
+.ops-preview-row strong {
+  color: var(--gold);
+}
+
+.pill-row span,
+.badge,
+.status-pill {
+  background: rgba(255,255,255,.075);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+.pricing-panel,
+.login-panel {
+  align-self: stretch;
+}
+
+.pricing-panel {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.025)),
+    linear-gradient(135deg, rgba(121,201,191,.09), transparent 56%),
+    rgba(8,10,9,.86);
+}
+
+.pricing-trust-line {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin: 14px 0 4px;
+}
+
+.pricing-trust-line span {
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 999px;
+  padding: 7px 8px;
+  text-align: center;
+  color: var(--paper);
+  background: rgba(0,0,0,.18);
+  font-size: .74rem;
+  font-weight: 800;
+}
+
+.compact-pricing {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(239,197,102,.6) rgba(255,255,255,.08);
+}
+
+.tier-card {
+  border-radius: 16px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.02)),
+    rgba(0,0,0,.18);
+}
+
+.tier-card:nth-child(2) {
+  border-color: rgba(121,201,191,.28);
+}
+
+.tier-card:nth-child(3) {
+  border-color: rgba(239,197,102,.32);
+}
+
+.tier-card:nth-child(4) {
+  border-color: rgba(167,83,99,.34);
+}
+
+.tier-card.selected {
+  border-color: rgba(239,197,102,.84);
+  box-shadow: 0 0 0 3px rgba(239,197,102,.13), 0 22px 48px rgba(0,0,0,.34);
+}
+
+.tier-price {
+  font-family: var(--font);
+  color: var(--paper);
+  letter-spacing: 0;
+}
+
+.tier-best {
+  color: rgba(255,248,236,.9);
+}
+
+.login-panel {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.025)),
+    rgba(7,9,8,.9);
+}
+
+.compact-tabs {
+  padding: 5px;
+  border: 1px solid rgba(255,255,255,.11);
+  border-radius: 999px;
+  background: rgba(0,0,0,.22);
+}
+
+.compact-tabs button,
+.ghost,
+.primary {
+  border-radius: 999px;
+}
+
+.primary,
+.compact-tabs button.active {
+  background: linear-gradient(135deg, var(--gold), var(--gold-soft)) !important;
+  color: #17120a !important;
+  box-shadow: 0 12px 28px rgba(183,119,45,.22);
+}
+
+.ghost:hover,
+.compact-tabs button:hover {
+  border-color: rgba(239,197,102,.62);
+  background: rgba(239,197,102,.08);
+}
+
+input,
+select,
+textarea {
+  border-radius: 12px;
+  background: rgba(0,0,0,.32);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: rgba(121,201,191,.8);
+  box-shadow: 0 0 0 3px rgba(121,201,191,.12);
+}
+
+.demo-login-card {
+  border-color: rgba(121,201,191,.26);
+  background:
+    linear-gradient(135deg, rgba(121,201,191,.1), rgba(239,197,102,.06)),
+    rgba(0,0,0,.22);
+}
+
+.demo-button-grid .ghost {
+  justify-content: center;
+  min-height: 42px;
+}
+
+.app-menu {
+  background:
+    linear-gradient(90deg, rgba(5,7,6,.98), rgba(14,17,14,.92)),
+    linear-gradient(135deg, rgba(239,197,102,.12), rgba(121,201,191,.06));
+}
+
+.menu-bar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(239,197,102,.6) rgba(255,255,255,.08);
+}
+
+.menu-bar button,
+.menu-trigger {
+  border-radius: 999px !important;
+}
+
+.menu-bar button.active,
+.menu-bar button:hover,
+.menu-trigger:hover {
+  border-color: rgba(121,201,191,.55) !important;
+  background: linear-gradient(135deg, rgba(121,201,191,.14), rgba(239,197,102,.08)) !important;
+}
+
+.dashboard-brand-hero {
+  background:
+    linear-gradient(90deg, rgba(3,5,4,.92) 0%, rgba(3,5,4,.66) 38%, rgba(3,5,4,.12) 78%),
+    url('assets/images/chefledger_ig_banner.png') center / cover no-repeat;
+}
+
+.dashboard-hero-copy h2 {
+  font-family: var(--font);
+  text-transform: uppercase;
+}
+
+.kitchen-image-card {
+  border-radius: 16px;
+}
+
+.table-wrap,
+.list-item,
+.mini-card,
+.result-box,
+.inner-card {
+  border-color: rgba(255,255,255,.12);
+}
+
+@media (max-width: 1280px) {
+  #authScreen.auth-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .brand-panel {
+    min-height: 620px;
+  }
+
+  .compact-pricing {
+    max-height: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .auth-shell {
+    padding: 12px;
+  }
+
+  .brand-panel {
+    min-height: auto;
+    padding: 22px;
+  }
+
+  .brand-panel h1 {
+    max-width: 100%;
+    font-size: clamp(2.12rem, 10vw, 2.72rem);
+    line-height: 1.02;
+  }
+
+  .hero-proof-grid,
+  .pricing-trust-line {
+    grid-template-columns: 1fr;
+  }
+
+  .ops-preview-head,
+  .ops-preview-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .compact-tabs {
+    border-radius: 16px;
+  }
+
+  .compact-tabs button {
+    flex: 1 1 100%;
+  }
+
+  .top-actions {
+    width: 100%;
+  }
+
+  .top-actions > *,
+  .top-actions select {
+    width: 100%;
+  }
+}

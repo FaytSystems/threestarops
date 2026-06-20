@@ -4,9 +4,10 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>ThreeStarOps — Back-of-House Operations</title>
+<title>ThreeStarOps | Chef Ledger Kitchen Command Center</title>
+<meta content="Chef Ledger by ThreeStarOps is a premium back-of-house operating system for inventory, prep, ordering, recipes, scheduling, files, and restaurant accountability." name="description"/>
 <meta http-equiv="Cache-Control" content="no-store"/>
-<link href="/styles.css?v=67" rel="stylesheet"/>
+<link href="/styles.css?v=68" rel="stylesheet"/>
 <link href="/manifest.webmanifest" rel="manifest"/>
 <meta content="#111614" name="theme-color"/>
 <script async src="https://js.stripe.com/v3/buy-button.js"></script>
@@ -26,13 +27,27 @@
 <datalist id="productSearchOptions"></datalist>
 <datalist id="recipeSearchOptions"></datalist>
 <datalist id="stationOptions"></datalist><datalist id="stockLocationOptions"></datalist>
-<main class="auth-shell" id="authScreen">
+<main class="auth-shell premium-auth-shell" id="authScreen">
 <section class="auth-card brand-panel">
-<div class="mark">CL</div>
-<p class="eyebrow">ThreeStarOps restaurant operating system</p>
-<h1>Drop the clipboard. Let the kitchen ledger do the arithmetic.</h1>
-<p class="muted">Chef Ledger turns the work restaurants already do — counts, prep lists, station restocks, vendor orders, recipe cards, POS history, and employee submissions — into one clean, auditable workflow.</p>
+<div class="hero-brand-lockup">
+<div class="mark">3★</div>
+<div><span>ThreeStarOps</span><strong>Chef Ledger</strong></div>
+</div>
+<p class="eyebrow">Premium back-of-house operating system</p>
+<h1>ThreeStarOps Kitchen Command Center</h1>
+<p class="muted lead-copy">Chef Ledger turns the work restaurants already do — counts, prep lists, station restocks, vendor orders, recipe cards, POS history, and employee submissions — into one clean, auditable workflow.</p>
 <p class="muted">After the initial setup, the hours saved can pay for the subscription. Plug in the numbers, let the builder fill the site, and keep working while the app turns daily kitchen activity into order sheets, prep sheets, inventory history, and accountability.</p>
+<div class="hero-proof-grid" aria-label="Chef Ledger operating areas">
+<div><strong>Count</strong><span>Storage, par, station stock</span></div>
+<div><strong>Prep</strong><span>Forecasts, claims, chef review</span></div>
+<div><strong>Order</strong><span>Vendor deadlines and sheets</span></div>
+</div>
+<div class="ops-preview-panel" aria-label="Chef Ledger workflow preview">
+<div class="ops-preview-head"><span>Tonight's control board</span><strong>Ready for service</strong></div>
+<div class="ops-preview-row"><span>Walk-in count</span><strong>94%</strong></div>
+<div class="ops-preview-row"><span>Prep claims complete</span><strong>18 / 21</strong></div>
+<div class="ops-preview-row"><span>Next vendor deadline</span><strong>2:30 PM</strong></div>
+</div>
 <div class="pill-row">
 <span>No more chicken-scratch counts</span>
 <span>Automatic order sheets</span>
@@ -44,10 +59,11 @@
 <p class="eyebrow">Choose a tier</p>
 <h2>Simple monthly pricing for real kitchens</h2>
 <p class="muted small-note">Start with the tier that fits your operation. Every tier is capped by included FILES storage so the website owner can control overhead while restaurants only pay for what they need.</p>
+<div class="pricing-trust-line"><span>Starter</span><span>Kitchen</span><span>Chef</span><span>Authority</span></div>
 <div class="pricing-grid compact-pricing" id="authTierCards"></div>
 <p class="muted small-note">Stripe paylinks can be configured per tier. In local preview, choosing a tier creates the account and keeps the workspace locked until the subscription is activated.</p>
 </section>
-<section class="auth-card">
+<section class="auth-card login-panel">
 <div class="tabs compact-tabs" data-tabs="authTabs">
 <button class="active" data-tab="login">Login</button>
 <button data-tab="register">Create account</button>
@@ -62,9 +78,9 @@
 <strong>Sign in demo account</strong>
 <p class="muted small-note">Choose a sized demo restaurant. Each one signs in automatically and opens a filled demo site.</p>
 <div class="demo-button-grid">
-<button class="ghost demo-login-option" data-demo-email="boutique@chefledger.test" type="button">DEMO-boutique</button>
-<button class="ghost demo-login-option" data-demo-email="steady@chefledger.test" type="button">DEMO-steady</button>
-<button class="ghost demo-login-option" data-demo-email="highvolume@chefledger.test" type="button">DEMO-high volume</button>
+<button class="ghost demo-login-option" data-demo-email="boutique@chefledger.test" type="button">Boutique demo</button>
+<button class="ghost demo-login-option" data-demo-email="steady@chefledger.test" type="button">Steady demo</button>
+<button class="ghost demo-login-option" data-demo-email="highvolume@chefledger.test" type="button">High-volume demo</button>
 </div>
 <code>Password for all: ChefLedger123!</code>
 </div>
@@ -873,6 +889,6 @@ Rice bowls" required=""></textarea></label>
 <article class="card wide leader-only"><h2>Employee Scheduling Profile moved to BUILD</h2><p class="muted">Station qualifications, eligible shifts, assigned color, can-work rules, and can't-work rules are now maintained under BUILD → Employee → Scheduling Profile.</p><button class="primary" data-focus="buildEmployeeScheduleProfilePage" data-view="build" type="button">Open BUILD Scheduling Profile</button></article></div>
 </section>
 </section></main>
-<script src="/app.js?v=67"></script>
+<script src="/app.js?v=68"></script>
 </body>
 </html>
