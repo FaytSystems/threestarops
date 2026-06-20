@@ -1,0 +1,16 @@
+name = "threestarops"
+compatibility_date = "2026-06-20"
+pages_build_output_dir = "static"
+
+# After creating the D1 database, paste its database_id here.
+# Keep binding = "DB" exactly because the Pages Function expects env.DB.
+[[d1_databases]]
+binding = "DB"
+database_name = "threestarops-db"
+database_id = "PASTE_D1_DATABASE_ID_HERE"
+
+# Optional but recommended for uploaded pictures/CSVs later.
+# Keep binding = "FILES_BUCKET" exactly because the Pages Function expects env.FILES_BUCKET.
+[[r2_buckets]]
+binding = "FILES_BUCKET"
+bucket_name = "threestarops-files"

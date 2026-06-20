@@ -120,3 +120,16 @@ git push origin main
 ```
 
 Then redeploy on Render.
+
+## Cloudflare D1/R2 deployment
+
+This v64 package includes a Cloudflare-native account/subscription backend in:
+
+```text
+functions/api/[[path]].js
+migrations/0001_cloudflare_d1_auth.sql
+wrangler.toml
+README_CLOUDFLARE_D1_R2_THREESTAROPS.md
+```
+
+Use Cloudflare Pages with build output directory `static`, D1 binding `DB`, optional R2 binding `FILES_BUCKET`, and Stripe webhook endpoint `/api/stripe/webhook`.

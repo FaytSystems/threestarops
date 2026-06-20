@@ -1,0 +1,13 @@
+{
+  "name": "threestarops-cloudflare",
+  "version": "64.0.0",
+  "private": true,
+  "scripts": {
+    "cf:d1:create": "wrangler d1 create threestarops-db",
+    "cf:d1:migrate": "wrangler d1 execute threestarops-db --remote --file migrations/0001_cloudflare_d1_auth.sql",
+    "cf:deploy": "wrangler pages deploy static --project-name threestarops"
+  },
+  "devDependencies": {
+    "wrangler": "latest"
+  }
+}
