@@ -2184,7 +2184,7 @@ async function submitStationCount(e) {
   const station = $('#stationCountStation')?.value || state.user?.station || '';
   const count_date = $('#stationCountDate')?.value || todayInput();
   const service_period = $('#stationCountService')?.value || '';
-  const counts = $$('[data-station-count-row]').map(row => ({
+  const counts = $$('[data-station-count-row]', e.currentTarget).map(row => ({
     product_id: row.dataset.stationCountRow,
     pre_stocked_qty: row.querySelector('[name="pre_stocked_qty"]').value,
     post_stocked_qty: row.querySelector('[name="post_stocked_qty"]').value,
