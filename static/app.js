@@ -106,6 +106,8 @@ function money(n) {
   }
 }
 const qty = (n) => Number(n || 0).toLocaleString(undefined, { maximumFractionDigits: 3 });
+const prepTaskQty = (t) => qty(t?.qty ?? t?.quantity ?? 0);
+const isPrepTaskDone = (t) => ['done', 'complete', 'completed', 'canceled', 'cancelled'].includes(String(t?.status || '').toLowerCase());
 const escapeHtml = (str) => String(str ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 const ROLE_LEVEL = { employee: 1, team_leader: 2, manager: 3, chef: 4, owner: 5 };
 function isLeader() { return Boolean(state.capabilities?.is_leader || ROLE_LEVEL[state.user?.role] >= ROLE_LEVEL.team_leader); }
@@ -1235,7 +1237,7 @@ async function loadDashboard() {
     kpi('Open shifts', data.open_shifts?.length || 0, 'available for sign-up'),
   ].join('');
   $('#neededNowList').innerHTML = listOrEmpty((data.tasks || []).map(t => `
-    <div class="list-item"><div class="row"><strong>${escapeHtml(t.title)}</strong><span class="status-pill">P${t.priority}</span></div><span class="muted">${escapeHtml(t.station || 'No station')} · ${qty(t.qty)} ${escapeHtml(t.unit)} · due ${escapeHtml(t.due_at || 'not set')}</span></div>`));
+    <div class="list-item"><div class="row"><strong>${escapeHtml(t.title)}</strong><span class="status-pill">P${t.priority}</span></div><span class="muted">${escapeHtml(t.station || 'No station')} · ${prepTaskQty(t)} ${escapeHtml(t.unit)} · due ${escapeHtml(t.due_at || 'not set')}</span></div>`));
   $('#riskList').innerHTML = listOrEmpty((data.low_stock || []).map(s => riskItem(s)));
   $('#openShiftList').innerHTML = listOrEmpty((data.open_shifts || []).map(s => `<div class="list-item"><strong>${escapeHtml(s.title)}</strong><span class="muted">${escapeHtml(s.station)} · ${fmtDateTime(s.start_at)} → ${fmtDateTime(s.end_at)}</span></div>`));
   $('#expiringList').innerHTML = listOrEmpty((data.expiring_batches || []).map(b => `<div class="list-item"><strong>${escapeHtml(b.notes || 'Prepared batch')}</strong><span class="muted">${escapeHtml(b.station)} · expires ${fmtDateTime(b.expires_at)}</span></div>`));
@@ -1975,11 +1977,12 @@ async function submitPrepChecklist() {
   const service_period = $('#employeePrepService')?.value || 'dinner';
   const selections = $$('#employeePrepChecklist [data-prep-kind]').map(row => {
     if (!row.querySelector('[name="selected"]')?.checked) return null;
-    return { kind: row.dataset.prepKind, id: row.dataset.prepId, qty: row.querySelector('[name="qty"]')?.value || 1, unit: row.querySelector('[name="unit"]')?.value || 'each', flags: { is_86: row.querySelector('[name="is_86"]')?.checked || false, need_before_start: row.querySelector('[name="need_before_start"]')?.checked || false, watch_list: row.querySelector('[name="watch_list"]')?.checked || false, expiring_soon: row.querySelector('[name="expiring_soon"]')?.checked || false } };
+    return { kind: row.dataset.prepKind, id: row.dataset.prepId, name: row.querySelector('strong')?.textContent || '', qty: row.querySelector('[name="qty"]')?.value || 1, unit: row.querySelector('[name="unit"]')?.value || 'each', flags: { is_86: row.querySelector('[name="is_86"]')?.checked || false, need_before_start: row.querySelector('[name="need_before_start"]')?.checked || false, watch_list: row.querySelector('[name="watch_list"]')?.checked || false, expiring_soon: row.querySelector('[name="expiring_soon"]')?.checked || false } };
   }).filter(Boolean);
   if (!selections.length) return toast('Check at least one station item or recipe');
   const result = await api('/api/prep/station_build_submit', { method: 'POST', body: JSON.stringify({ station, prep_date, service_period, selections }) });
-  toast(`Uploaded ${result.created.length} prep-needed item(s) to the chef profile.`);
+  const createdCount = Number(result.task_count ?? result.tasks?.length ?? result.created?.length ?? 0);
+  toast(`Uploaded ${createdCount} prep-needed item(s) to the chef profile.`);
   await preloadCore();
   await loadPrep();
   if (state.activeView === 'inventory') await loadInventory();
@@ -2024,7 +2027,7 @@ function managerPrepTaskItem(t) {
   const urgent = Number(t.priority || 4) <= 2 ? 'warn' : '';
   return `<div class="list-item manager-prep-task ${urgent}">
     <div class="row"><strong>${escapeHtml(t.title)}</strong><span>P${escapeHtml(t.priority || '')} · suggested ${escapeHtml(t.suggested_rank || '')}</span></div>
-    <span class="muted">${escapeHtml(t.station || 'Unassigned')} · need by ${escapeHtml(t.need_by_label || 'next shift')} · ${qty(t.qty)} ${escapeHtml(t.unit || '')}</span>
+    <span class="muted">${escapeHtml(t.station || 'Unassigned')} · need by ${escapeHtml(t.need_by_label || 'next shift')} · ${prepTaskQty(t)} ${escapeHtml(t.unit || '')}</span>
     <div class="inline-row"><button class="ghost edit-task-priority" data-id="${t.id}" data-priority="${t.suggested_rank || 2}">Suggested RANK</button><label>ASSIGN / SEND TO <select data-prep-assign="${t.id}">${candidateOptions}</select></label><button class="primary assign-prep-task" data-id="${t.id}">Assign</button></div>
   </div>`;
 }
@@ -2076,18 +2079,19 @@ async function renderPrepSelected(dateOverride = '') {
   }
   const claimList = $('#claimPrepList');
   if (claimList) {
-    const claimable = (agg.tasks || []).filter(t => t.status !== 'done' && (!t.assigned_to || String(t.assigned_to) === String(state.user?.id || '')));
+    const claimable = (agg.tasks || []).filter(t => !isPrepTaskDone(t) && (!t.assigned_to || String(t.assigned_to) === String(state.user?.id || '')));
     claimList.innerHTML = listOrEmpty(claimable.map(t => prepTaskItem(t, true)), 'No claimable prep items right now. Checked PREP? items from station closeout will show here.');
   }
   await renderChefPrepReview(date);
 }
 
 function prepTaskItem(t, withActions = false) {
-  const status = t.status === 'done' ? 'good' : Number(t.priority) <= 2 ? 'warn' : '';
+  const done = isPrepTaskDone(t);
+  const status = done ? 'good' : Number(t.priority) <= 2 ? 'warn' : '';
   return `<div class="list-item">
     <div class="row"><strong>${escapeHtml(t.title)}</strong><span class="${status}">${escapeHtml(t.status || 'todo')}</span></div>
-    <span class="muted">${escapeHtml(t.station || 'No station')} · ${qty(t.qty)} ${escapeHtml(t.unit)} · assigned ${escapeHtml(t.assigned_name || 'unassigned')} · priority ${t.priority}</span>
-    ${withActions && t.status !== 'done' ? `<div class="row"><button class="primary complete-task" data-id="${t.id}">Complete + deduct inventory</button><button class="ghost edit-task-priority" data-id="${t.id}" data-priority="1">Rank needed now</button><button class="ghost claim-prep-task" data-id="${t.id}">CLAIM</button></div>` : ''}
+    <span class="muted">${escapeHtml(t.station || 'No station')} · ${prepTaskQty(t)} ${escapeHtml(t.unit)} · assigned ${escapeHtml(t.assigned_name || 'unassigned')} · priority ${t.priority}</span>
+    ${withActions && !done ? `<div class="row"><button class="primary complete-task" data-id="${t.id}">Complete + deduct inventory</button><button class="ghost edit-task-priority" data-id="${t.id}" data-priority="1">Rank needed now</button><button class="ghost claim-prep-task" data-id="${t.id}">CLAIM</button></div>` : ''}
   </div>`;
 }
 
