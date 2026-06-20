@@ -71,3 +71,8 @@ highvolume@chefledger.test / ChefLedger123!
 ```
 
 Demo users are seeded with fake vendors, products, plates, stations, locations, and fake YTD POS history for forecaster testing.
+
+
+## v66 hotfix
+
+Full-file rewrites included `functions/api/[[path]].js`, `static/app.js`, and `README.md`. This release lowers the Cloudflare PBKDF2 password hashing iteration count to the supported maximum of 100,000 and adds a dedicated `/api/auth/demo` route so the main landing-page demo buttons open active authority-tier demo accounts without relying on a password checkout flow.

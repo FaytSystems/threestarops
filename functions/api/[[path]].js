@@ -8,6 +8,7 @@ const BUY_BUTTONS = {
 };
 
 const TIER_ORDER = ['starter', 'kitchen', 'chef', 'authority'];
+const PASSWORD_ITERATIONS = 100000; // Cloudflare Workers PBKDF2 supports up to 100,000 iterations.
 
 const TIERS = [
   { key: 'starter', name: 'Starter', price: 10, tagline: 'Drop the pen and paper.', best_for: 'Small kitchens getting counts, par sheets, and menu lists out of notebooks.', features: ['Email signup and secure account', 'Basic inventory builder', 'Simple menu CSV', 'Starter saved counts', '1 GB FILES cap'], limits: { tier: 'starter', storage_mb: 1024, saved_inventories: 5, inventory_snapshots: 5, saved_counts: 7, count_snapshots: 7, saved_orders: 7, delivery_records: 7, menu_level: 'csv', qr: false }, stripe_buy_button_id: BUY_BUTTONS.starter, stripe_publishable_key: STRIPE_PUBLISHABLE_KEY },
@@ -60,7 +61,7 @@ function capabilitiesFor(tier, role = 'owner') {
 async function readJson(request) { const text = await request.text(); if (!text) return {}; try { return JSON.parse(text); } catch { return {}; } }
 function getCookie(request, name) { const cookie = request.headers.get('cookie') || ''; for (const part of cookie.split(';').map(x => x.trim())) { const idx = part.indexOf('='); if (idx > 0 && part.slice(0, idx) === name) return decodeURIComponent(part.slice(idx + 1)); } return ''; }
 function sessionCookie(value, maxAge = 60 * 60 * 24 * 30) { return `cl_session=${encodeURIComponent(value)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${maxAge}`; }
-async function hashPassword(password, salt) { const enc = new TextEncoder(); const key = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']); const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt: enc.encode(salt), iterations: 150000, hash: 'SHA-256' }, key, 256); return Array.from(new Uint8Array(bits)).map(b => b.toString(16).padStart(2, '0')).join(''); }
+async function hashPassword(password, salt) { const enc = new TextEncoder(); const key = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']); const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt: enc.encode(salt), iterations: PASSWORD_ITERATIONS, hash: 'SHA-256' }, key, 256); return Array.from(new Uint8Array(bits)).map(b => b.toString(16).padStart(2, '0')).join(''); }
 function timingSafeEqual(a, b) { if (String(a).length !== String(b).length) return false; let out = 0; for (let i = 0; i < String(a).length; i++) out |= String(a).charCodeAt(i) ^ String(b).charCodeAt(i); return out === 0; }
 async function verifyPassword(password, salt, expectedHash) { if (!salt || !expectedHash) return false; return timingSafeEqual(await hashPassword(password, salt), expectedHash); }
 
@@ -168,6 +169,16 @@ async function login(env, body) {
   let row = await env.DB.prepare('SELECT u.*, t.name AS team_name FROM users u LEFT JOIN teams t ON t.id = u.team_id WHERE lower(u.email) = lower(?)').bind(email).first(); if (!row && DEMO_EMAILS.has(email)) row = await ensureDemoUser(env, email); if (!row) return bad('Invalid email or password.', 401);
   const ok = await verifyPassword(password, row.password_salt, row.password_hash); if (!ok) return bad('Invalid email or password.', 401);
   await env.DB.prepare('UPDATE users SET last_login_at = ?, updated_at = ? WHERE id = ?').bind(nowIso(), nowIso(), row.id).run(); row = await env.DB.prepare('SELECT u.*, t.name AS team_name FROM users u LEFT JOIN teams t ON t.id = u.team_id WHERE u.id = ?').bind(row.id).first(); const sid = await createSession(env, row.id); return json(sessionPayload(row), 200, { 'set-cookie': sessionCookie(sid) });
+}
+async function demoLogin(env, body) {
+  const requested = lower(body.email || body.demo_email || 'highvolume@chefledger.test');
+  const email = DEMO_EMAILS.has(requested) ? requested : 'highvolume@chefledger.test';
+  const row = await ensureDemoUser(env, email);
+  await env.DB.prepare('UPDATE users SET tier = ?, subscription_status = ?, last_login_at = ?, updated_at = ? WHERE id = ?').bind('authority', 'active', nowIso(), nowIso(), row.id).run();
+  await env.DB.prepare('UPDATE teams SET tier = ?, subscription_status = ?, updated_at = ? WHERE id = ?').bind('authority', 'active', nowIso(), row.team_id).run();
+  const refreshed = await env.DB.prepare('SELECT u.*, t.name AS team_name FROM users u LEFT JOIN teams t ON t.id = u.team_id WHERE u.id = ?').bind(row.id).first();
+  const sid = await createSession(env, row.id);
+  return json({ ...sessionPayload(refreshed), demo: true }, 200, { 'set-cookie': sessionCookie(sid) });
 }
 async function requireUser(env, request) { const row = await getUserBySession(env, request); if (!row) return { error: bad('Login required.', 401) }; return { row }; }
 async function requireActive(env, request) { const { row, error } = await requireUser(env, request); if (error) return { error }; const sub = subscriptionFor(row); if (!sub.active) return { error: json({ error: 'Subscription required.', subscription_required: true, subscription: sub, tiers: TIERS }, 402) }; return { row }; }
@@ -300,12 +311,13 @@ async function handleTeamAndSchedule(env, row, method, path, body, url) {
 async function handleApi(context) {
   const { request, env, params } = context; if (!env.DB) return bad('Cloudflare D1 binding DB is missing. Add a D1 binding named DB to the Pages project.', 500); await ensureSchema(env);
   const method = request.method.toUpperCase(); const path = Array.isArray(params.path) ? params.path.join('/') : (params.path || ''); const url = new URL(request.url);
-  if (method === 'GET' && path === 'health') return json({ ok: true, runtime: 'cloudflare-pages-functions', d1: true, r2: Boolean(env.FILES_BUCKET), version: 'v65-full-cloudflare' });
+  if (method === 'GET' && path === 'health') return json({ ok: true, runtime: 'cloudflare-pages-functions', d1: true, r2: Boolean(env.FILES_BUCKET), version: 'v66-cloudflare-demo-pbkdf2-fix' });
   if (method === 'GET' && path === 'subscription/tiers') return json({ tiers: TIERS });
   if (method === 'POST' && path === 'stripe/webhook') return handleStripeWebhook(env, request);
   if (method === 'GET' && path.startsWith('recipebook/')) return recipebook(env, path.split('/').pop());
   if (method === 'POST' && path === 'auth/register') return register(env, await readJson(request));
   if (method === 'POST' && path === 'auth/login') return login(env, await readJson(request));
+  if (method === 'POST' && path === 'auth/demo') return demoLogin(env, await readJson(request));
   if (method === 'POST' && path === 'auth/logout') return json({ ok: true }, 200, { 'set-cookie': sessionCookie('', 0) });
   if (method === 'POST' && path === 'auth/join') return bad('Employee invite/passcode join will be enabled after the first staff invite flow is finalized.', 400);
   if (method === 'GET' && path === 'session') { const row = await getUserBySession(env, request); return json(sessionPayload(row)); }

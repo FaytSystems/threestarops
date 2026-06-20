@@ -3565,15 +3565,25 @@ function setupEvents() {
   $$('.demo-login-option').forEach(btn => btn.addEventListener('click', async () => {
     const email = btn.dataset.demoEmail || 'highvolume@chefledger.test';
     const login = $('#loginForm');
-    login.email.value = email;
-    login.password.value = 'ChefLedger123!';
+    if (login?.email) login.email.value = email;
+    if (login?.password) login.password.value = 'ChefLedger123!';
+    btn.disabled = true;
     try {
-      await api('/api/auth/login', { method: 'POST', body: JSON.stringify({ email, password: 'ChefLedger123!' }) });
+      await api('/api/auth/demo', { method: 'POST', body: JSON.stringify({ email }) });
       toast(`${btn.textContent.trim()} loaded. Opening the demo restaurant.`);
       state.activeView = 'dashboard';
       await loadSession();
     } catch (err) {
-      toast(err.message || 'Demo account could not be loaded.');
+      try {
+        await api('/api/auth/login', { method: 'POST', body: JSON.stringify({ email, password: 'ChefLedger123!' }) });
+        toast(`${btn.textContent.trim()} loaded. Opening the demo restaurant.`);
+        state.activeView = 'dashboard';
+        await loadSession();
+      } catch (fallbackErr) {
+        toast(fallbackErr.message || err.message || 'Demo account could not be loaded.');
+      }
+    } finally {
+      btn.disabled = false;
     }
   }));
   $('#registerForm').addEventListener('submit', submitAuth('/api/auth/register'));
