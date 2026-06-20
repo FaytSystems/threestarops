@@ -48,6 +48,20 @@ CREATE TABLE IF NOT EXISTS stripe_events (
   created_at TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS app_records (
+  id TEXT PRIMARY KEY,
+  team_id TEXT NOT NULL,
+  type TEXT NOT NULL,
+  data_json TEXT NOT NULL,
+  created_by TEXT NOT NULL DEFAULT '',
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  FOREIGN KEY (team_id) REFERENCES teams(id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_app_records_team_type ON app_records(team_id, type, updated_at);
+CREATE INDEX IF NOT EXISTS idx_app_records_type_id ON app_records(type, id);
+
 CREATE TABLE IF NOT EXISTS picture_folders (
   id TEXT PRIMARY KEY,
   team_id TEXT NOT NULL,
