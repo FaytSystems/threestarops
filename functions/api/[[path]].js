@@ -185,20 +185,87 @@ async function requireActive(env, request) { const { row, error } = await requir
 
 async function parseClientReference(ref) { const parts = String(ref || '').split('|'); const out = {}; for (const part of parts) { const idx = part.indexOf('='); if (idx > -1) out[part.slice(0, idx)] = part.slice(idx + 1); } return out; }
 function tierFromBuyButton(id) { return Object.entries(BUY_BUTTONS).find(([, v]) => v === id)?.[0] || ''; }
-async function verifyStripeSignature(request, bodyText, secret) { if (!secret) return { ok: true, skipped: true }; const sig = request.headers.get('stripe-signature') || ''; const items = Object.fromEntries(sig.split(',').map(part => { const [k, v] = part.split('='); return [k, v]; })); const timestamp = items.t; const v1 = items.v1; if (!timestamp || !v1) return { ok: false, error: 'Missing Stripe signature pieces.' }; const signedPayload = `${timestamp}.${bodyText}`; const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']); const digest = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(signedPayload)); const hex = Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join(''); return { ok: timingSafeEqual(hex, v1) }; }
+async function verifyStripeSignature(request, bodyText, secret) {
+  if (!secret) return { ok: false };
+  const parts = (request.headers.get('stripe-signature') || '').split(',').map(part => part.trim());
+  const timestamp = parts.find(part => part.startsWith('t='))?.slice(2);
+  const signatures = parts.filter(part => part.startsWith('v1=')).map(part => part.slice(3));
+  const age = Math.abs(Date.now() / 1000 - Number(timestamp));
+  if (!timestamp || !signatures.length || !Number.isFinite(age) || age > 300) return { ok: false };
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const digest = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(`${timestamp}.${bodyText}`));
+  const hex = Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
+  return { ok: signatures.some(sig => /^[a-f0-9]{64}$/i.test(sig) && timingSafeEqual(hex, sig.toLowerCase())) };
+}
+function stripeObjectId(value) { return typeof value === 'string' ? value : value?.id || ''; }
+function stripeSubscriptionId(obj) {
+  return obj.object === 'subscription' ? obj.id : stripeObjectId(obj.subscription || obj.parent?.subscription_details?.subscription);
+}
 async function handleStripeWebhook(env, request) {
-  const bodyText = await request.text(); const verified = await verifyStripeSignature(request, bodyText, env.STRIPE_WEBHOOK_SECRET || ''); if (!verified.ok) return bad('Invalid Stripe signature.', 400);
+  if (!env.STRIPE_WEBHOOK_SECRET) return bad('Webhook signing secret is not configured.', 503);
+  const bodyText = await request.text(); const verified = await verifyStripeSignature(request, bodyText, env.STRIPE_WEBHOOK_SECRET); if (!verified.ok) return bad('Invalid Stripe signature.', 400);
   let event; try { event = JSON.parse(bodyText); } catch { return bad('Invalid JSON.', 400); }
-  const eventId = event.id || randomId('stripe_event'); const existing = await env.DB.prepare('SELECT id FROM stripe_events WHERE id = ?').bind(eventId).first(); if (existing) return json({ ok: true, duplicate: true });
-  await env.DB.prepare('INSERT INTO stripe_events (id, type, payload, created_at) VALUES (?, ?, ?, ?)').bind(eventId, event.type || '', bodyText, nowIso()).run();
-  const obj = event.data?.object || {};
-  if (['checkout.session.completed', 'customer.subscription.created', 'customer.subscription.updated', 'invoice.payment_succeeded'].includes(event.type)) {
-    const ref = await parseClientReference(obj.client_reference_id || obj.client_reference_id_string || obj.metadata?.client_reference_id || ''); let userId = ref.user || obj.metadata?.user_id || ''; let teamId = ref.team || obj.metadata?.team_id || ''; let tier = tierByKey(ref.tier || obj.metadata?.tier || tierFromBuyButton(obj.metadata?.buy_button_id || '') || 'starter').key;
-    if (!userId && obj.customer_email) { const u = await env.DB.prepare('SELECT id, team_id, tier FROM users WHERE lower(email) = lower(?)').bind(lower(obj.customer_email)).first(); if (u) { userId = u.id; teamId = u.team_id; tier = tier || u.tier || 'starter'; } }
-    if (userId) { const status = obj.status === 'canceled' ? 'canceled' : 'active'; await env.DB.prepare(`UPDATE users SET tier = ?, subscription_status = ?, stripe_customer_id = COALESCE(?, stripe_customer_id), stripe_subscription_id = COALESCE(?, stripe_subscription_id), updated_at = ? WHERE id = ?`).bind(tier, status, obj.customer || null, obj.subscription || obj.id || null, nowIso(), userId).run(); if (teamId) await env.DB.prepare('UPDATE teams SET tier = ?, subscription_status = ?, updated_at = ? WHERE id = ?').bind(tier, status, nowIso(), teamId).run(); }
+  if (!event.id || !event.type || !event.data?.object || !Number.isFinite(event.created)) return bad('Invalid Stripe event.', 400);
+  const supported = ['checkout.session.completed', 'checkout.session.async_payment_succeeded', 'checkout.session.async_payment_failed', 'customer.subscription.created', 'customer.subscription.updated', 'customer.subscription.deleted', 'invoice.paid', 'invoice.payment_succeeded', 'invoice.payment_failed'];
+  if (!supported.includes(event.type)) return json({ ok: true, ignored: true });
+  const existing = await env.DB.prepare('SELECT id FROM stripe_events WHERE id = ?').bind(event.id).first();
+  if (existing) return json({ ok: true, duplicate: true });
+  const obj = event.data.object;
+  const subscriptionId = stripeSubscriptionId(obj);
+  if (!subscriptionId) return json({ ok: true, ignored: true });
+  let user;
+  let tier;
+  let status;
+  if (event.type.startsWith('checkout.session.')) {
+    // The account can share Stripe with other stores. Only accept this app's checkout references.
+    if (obj.mode !== 'subscription' || !String(obj.client_reference_id || '').startsWith('chefledger|')) return json({ ok: true, ignored: true });
+    const ref = await parseClientReference(obj.client_reference_id);
+    user = await env.DB.prepare('SELECT * FROM users WHERE id = ?').bind(ref.user || '').first();
+    if (!user || user.team_id !== ref.team || user.role !== 'owner') return bad('Checkout account reference does not match.', 400);
+    tier = TIERS.find(item => item.key === ref.tier);
+    // Do not trust the browser's tier label without checking Stripe's actual subtotal.
+    if (!tier || obj.currency !== 'usd' || obj.amount_subtotal !== tier.price * 100) return bad('Checkout price does not match the selected plan.', 400);
+    tier = tier.key;
+    if (user.stripe_subscription_id && user.stripe_subscription_id !== subscriptionId && ['active', 'trialing'].includes(user.subscription_status)) return bad('Account already has a different active subscription.', 409);
+    status = obj.payment_status === 'paid' ? 'active' : 'pending_checkout';
+    if (status === 'pending_checkout' && user.stripe_subscription_id === subscriptionId && ['active', 'trialing', 'canceled', 'unpaid'].includes(user.subscription_status)) status = user.subscription_status;
+  } else {
+    // Recurring events must match the subscription, never just a shared customer or email.
+    user = await env.DB.prepare('SELECT * FROM users WHERE stripe_subscription_id = ? AND role = ?').bind(subscriptionId, 'owner').first();
+    if (!user) return json({ ok: true, ignored: true });
+    tier = user.tier;
+    if (event.type.startsWith('customer.subscription.')) {
+      status = event.type === 'customer.subscription.deleted' ? 'canceled' : obj.status;
+      if (!['active', 'trialing', 'past_due', 'unpaid', 'canceled', 'incomplete', 'incomplete_expired', 'paused'].includes(status)) return bad('Unknown subscription status.', 400);
+      const prices = obj.items?.data || [];
+      const price = prices.length === 1 ? prices[0].price : null;
+      const matched = price?.currency === 'usd' && price.recurring?.interval === 'month' && (price.recurring.interval_count || 1) === 1 && (prices[0].quantity || 1) === 1
+        ? TIERS.find(item => item.price * 100 === price.unit_amount) : null;
+      if (['active', 'trialing'].includes(status) && !matched) return bad('Subscription price does not match a supported plan.', 400);
+      if (matched) tier = matched.key;
+    } else {
+      if (user.subscription_status === 'canceled') return json({ ok: true, ignored: true });
+      status = event.type === 'invoice.payment_failed' ? 'past_due' : 'active';
+      if (status === 'active' && obj.status !== 'paid' && obj.paid !== true) return bad('Invoice is not paid.', 400);
+    }
   }
-  if (['customer.subscription.deleted', 'invoice.payment_failed'].includes(event.type)) { const customer = obj.customer || ''; if (customer) await env.DB.prepare('UPDATE users SET subscription_status = ?, updated_at = ? WHERE stripe_customer_id = ?').bind('past_due', nowIso(), customer).run(); }
-  return json({ ok: true });
+  const latest = await env.DB.prepare(`SELECT MAX(CAST(json_extract(payload, '$.created') AS INTEGER)) AS created FROM stripe_events WHERE json_extract(payload, '$.data.object.subscription') = ? OR json_extract(payload, '$.data.object.id') = ? OR json_extract(payload, '$.data.object.parent.subscription_details.subscription') = ?`).bind(subscriptionId, subscriptionId, subscriptionId).first();
+  if (Number(latest?.created || 0) > event.created) return json({ ok: true, ignored: true, reason: 'older_event' });
+  const customerId = stripeObjectId(obj.customer) || user.stripe_customer_id || null;
+  const now = nowIso();
+  // D1 batches are atomic: failed account updates must not consume the event or prevent a retry.
+  try {
+    await env.DB.batch([
+      env.DB.prepare('UPDATE users SET tier = ?, subscription_status = ?, updated_at = ? WHERE team_id = ?').bind(tier, status, now, user.team_id),
+      env.DB.prepare('UPDATE users SET stripe_customer_id = ?, stripe_subscription_id = ? WHERE id = ?').bind(customerId, subscriptionId, user.id),
+      env.DB.prepare('UPDATE teams SET tier = ?, subscription_status = ?, updated_at = ? WHERE id = ?').bind(tier, status, now, user.team_id),
+      env.DB.prepare('INSERT INTO stripe_events (id, type, payload, created_at) VALUES (?, ?, ?, ?)').bind(event.id, event.type, bodyText, now),
+    ]);
+  } catch (error) {
+    if (await env.DB.prepare('SELECT id FROM stripe_events WHERE id = ?').bind(event.id).first()) return json({ ok: true, duplicate: true });
+    throw error;
+  }
+  return json({ ok: true, status, tier });
 }
 
 async function handleSimpleCollection(env, row, name, method, body = {}, path = '') {
@@ -323,7 +390,7 @@ async function handleTeamAndSchedule(env, row, method, path, body, url) {
 async function handleApi(context) {
   const { request, env, params } = context; if (!env.DB) return bad('Cloudflare D1 binding DB is missing. Add a D1 binding named DB to the Pages project.', 500); await ensureSchema(env);
   const method = request.method.toUpperCase(); const path = Array.isArray(params.path) ? params.path.join('/') : (params.path || ''); const url = new URL(request.url);
-  if (method === 'GET' && path === 'health') return json({ ok: true, runtime: 'cloudflare-pages-functions', d1: true, r2: Boolean(env.FILES_BUCKET), version: 'v67-cloudflare-create-account-fix' });
+  if (method === 'GET' && path === 'health') return json({ ok: true, runtime: 'cloudflare-pages-functions', d1: true, r2: Boolean(env.FILES_BUCKET), version: 'v68-stripe-webhook-validation' });
   if (method === 'GET' && path === 'subscription/tiers') return json({ tiers: TIERS });
   if (method === 'POST' && path === 'stripe/webhook') return handleStripeWebhook(env, request);
   if (method === 'GET' && path.startsWith('recipebook/')) return recipebook(env, path.split('/').pop());

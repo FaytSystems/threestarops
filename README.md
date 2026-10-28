@@ -62,6 +62,39 @@ https://threestarops.com/api/stripe/webhook
 
 Add `STRIPE_WEBHOOK_SECRET` as a Cloudflare Pages environment variable.
 
+### Verified subscription webhook setup
+
+Create a live Stripe snapshot destination for the endpoint above. Subscribe to:
+
+```text
+checkout.session.completed
+checkout.session.async_payment_succeeded
+checkout.session.async_payment_failed
+customer.subscription.created
+customer.subscription.updated
+customer.subscription.deleted
+invoice.paid
+invoice.payment_failed
+```
+
+Save this destination's signing secret as an encrypted production setting named
+`STRIPE_WEBHOOK_SECRET`, then redeploy. Each store uses its own destination secret.
+The embedded Stripe buy buttons do not require a server-side Stripe API key.
+
+The handler rejects missing/invalid signatures and timestamps older than five
+minutes. Checkout references must match an owner and team, and the USD subtotal
+must match the selected plan. Subscription plan changes support the four existing
+single-quantity monthly prices. Free trials and alternative billing arrangements
+must be explicitly integrated before enabling them in Stripe.
+
+Recurring events match stored subscription IDs. Updates to the owner, team members,
+team, and processed-event record commit together, so failed processing can retry.
+Older events are ignored when a newer subscription event has already been recorded.
+
+Run `npm run check:stripe` with Node 24 or newer for SQLite-backed payment tests.
+After deployment, verify a real Stripe delivery and the matching account's access;
+an unsigned-request rejection alone does not prove successful payment processing.
+
 ## Demo logins
 
 ```text

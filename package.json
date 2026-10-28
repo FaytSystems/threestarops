@@ -3,6 +3,7 @@
   "version": "65.0.0",
   "private": true,
   "scripts": {
+    "check:stripe": "node scripts/check-stripe-webhook.mjs",
     "cf:d1:create": "wrangler d1 create threestarops-db",
     "cf:d1:migrate": "wrangler d1 execute threestarops-db --remote --file migrations/0001_cloudflare_d1_auth.sql && wrangler d1 execute threestarops-db --remote --file migrations/0002_cloudflare_full_app_records.sql",
     "cf:d1:migrate:v65": "wrangler d1 execute threestarops-db --remote --file migrations/0002_cloudflare_full_app_records.sql",
